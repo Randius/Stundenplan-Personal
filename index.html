@@ -44,21 +44,39 @@
         }
         .morning-cell {
             background-color: #E8F5E9;
+            min-height: 60px;
         }
         .afternoon-cell {
             background-color: #C8E6C9;
+            min-height: 60px;
         }
         .employee-list {
             list-style-type: none;
             padding: 0;
             margin: 0;
         }
-        .employee-list li {
-            padding: 4px;
-            border-bottom: 1px solid #ddd;
+        .employee-item {
+            padding: 8px;
+            margin: 4px 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: move;
+            transition: background-color 0.2s;
         }
-        .employee-list li:last-child {
-            border-bottom: none;
+        .employee-item:hover {
+            background-color: #f0f0f0;
+        }
+        .employee-item.dragging {
+            opacity: 0.5;
+            background-color: #e0e0e0;
+        }
+        .drop-target {
+            background-color: #A5D6A7 !important;
+            border: 2px dashed #4CAF50;
+        }
+        .time-label {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -84,63 +102,130 @@
                     <td>1d</td>
                 </tr>
                 <tr>
-                    <td><strong>Vormittag</strong></td>
-                    <td class="morning-cell">
+                    <td class="time-label">Vormittag</td>
+                    <td class="morning-cell" data-class="1a" data-time="morning">
                         <ul class="employee-list" id="morning-1a">
-                            <li>Anna Müller</li>
-                            <li>Max Schmidt</li>
-                            <li>Lisa Bauer</li>
+                            <li class="employee-item" draggable="true" data-employee="Anna Müller">Anna Müller</li>
+                            <li class="employee-item" draggable="true" data-employee="Max Schmidt">Max Schmidt</li>
+                            <li class="employee-item" draggable="true" data-employee="Lisa Bauer">Lisa Bauer</li>
                         </ul>
                     </td>
-                    <td class="morning-cell">
+                    <td class="morning-cell" data-class="1b" data-time="morning">
                         <ul class="employee-list" id="morning-1b">
-                            <li>Thomas Weber</li>
-                            <li>Sarah Klein</li>
+                            <li class="employee-item" draggable="true" data-employee="Thomas Weber">Thomas Weber</li>
+                            <li class="employee-item" draggable="true" data-employee="Sarah Klein">Sarah Klein</li>
                         </ul>
                     </td>
-                    <td class="morning-cell">
+                    <td class="morning-cell" data-class="1c" data-time="morning">
                         <ul class="employee-list" id="morning-1c">
-                            <li>Peter Hofmann</li>
-                            <li>Julia Vogel</li>
-                            <li>David Fischer</li>
+                            <li class="employee-item" draggable="true" data-employee="Peter Hofmann">Peter Hofmann</li>
+                            <li class="employee-item" draggable="true" data-employee="Julia Vogel">Julia Vogel</li>
+                            <li class="employee-item" draggable="true" data-employee="David Fischer">David Fischer</li>
                         </ul>
                     </td>
-                    <td class="morning-cell">
+                    <td class="morning-cell" data-class="1d" data-time="morning">
                         <ul class="employee-list" id="morning-1d">
-                            <li>Laura Wagner</li>
-                            <li>Michael Schulze</li>
+                            <li class="employee-item" draggable="true" data-employee="Laura Wagner">Laura Wagner</li>
+                            <li class="employee-item" draggable="true" data-employee="Michael Schulze">Michael Schulze</li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
-                    <td><strong>Nachmittag</strong></td>
-                    <td class="afternoon-cell">
+                    <td class="time-label">Nachmittag</td>
+                    <td class="afternoon-cell" data-class="1a" data-time="afternoon">
                         <ul class="employee-list" id="afternoon-1a">
-                            <li>Markus Beck</li>
-                            <li>Sandra Hartmann</li>
+                            <li class="employee-item" draggable="true" data-employee="Markus Beck">Markus Beck</li>
+                            <li class="employee-item" draggable="true" data-employee="Sandra Hartmann">Sandra Hartmann</li>
                         </ul>
                     </td>
-                    <td class="afternoon-cell">
+                    <td class="afternoon-cell" data-class="1b" data-time="afternoon">
                         <ul class="employee-list" id="afternoon-1b">
-                            <li>Daniel Meißner</li>
-                            <li>Nina Braun</li>
-                            <li>Florian Richter</li>
+                            <li class="employee-item" draggable="true" data-employee="Daniel Meißner">Daniel Meißner</li>
+                            <li class="employee-item" draggable="true" data-employee="Nina Braun">Nina Braun</li>
+                            <li class="employee-item" draggable="true" data-employee="Florian Richter">Florian Richter</li>
                         </ul>
                     </td>
-                    <td class="afternoon-cell">
+                    <td class="afternoon-cell" data-class="1c" data-time="afternoon">
                         <ul class="employee-list" id="afternoon-1c">
-                            <li>Tobias Schäfer</li>
+                            <li class="employee-item" draggable="true" data-employee="Tobias Schäfer">Tobias Schäfer</li>
                         </ul>
                     </td>
-                    <td class="afternoon-cell">
+                    <td class="afternoon-cell" data-class="1d" data-time="afternoon">
                         <ul class="employee-list" id="afternoon-1d">
-                            <li>Katrin Lehmann</li>
-                            <li>Andreas Köhler</li>
+                            <li class="employee-item" draggable="true" data-employee="Katrin Lehmann">Katrin Lehmann</li>
+                            <li class="employee-item" draggable="true" data-employee="Andreas Köhler">Andreas Köhler</li>
                         </ul>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
+
+    <script>
+        // Drag & Drop Funktionalität
+        document.addEventListener('DOMContentLoaded', function() {
+            const employeeItems = document.querySelectorAll('.employee-item');
+            const cells = document.querySelectorAll('td[data-class][data-time]');
+
+            let draggedItem = null;
+            let originalCell = null;
+
+            // Drag Start
+            employeeItems.forEach(item => {
+                item.addEventListener('dragstart', function(e) {
+                    draggedItem = this;
+                    originalCell = this.parentElement.parentElement;
+                    this.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', this.dataset.employee);
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+
+                item.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                    draggedItem = null;
+                    originalCell = null;
+                    // Entferne drop-target Klasse von allen Zellen
+                    cells.forEach(cell => cell.classList.remove('drop-target'));
+                });
+            });
+
+            // Drag Over
+            cells.forEach(cell => {
+                cell.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    // Nur Vormittags-Zellen als Drop-Ziele zulassen
+                    if (cell.dataset.time === 'morning') {
+                        this.classList.add('drop-target');
+                    }
+                });
+
+                cell.addEventListener('dragleave', function() {
+                    this.classList.remove('drop-target');
+                });
+
+                cell.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drop-target');
+                    
+                    // Nur Vormittags-Zellen als Drop-Ziele zulassen
+                    if (this.dataset.time !== 'morning') {
+                        return;
+                    }
+
+                    if (draggedItem) {
+                        // Entferne den Mitarbeiter aus der ursprünglichen Zelle
+                        draggedItem.remove();
+                        
+                        // Füge den Mitarbeiter zur neuen Zelle hinzu
+                        const newList = this.querySelector('.employee-list');
+                        if (newList) {
+                            newList.appendChild(draggedItem);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
