@@ -194,8 +194,8 @@
                 cell.addEventListener('dragover', function(e) {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
-                    // Nur Vormittags-Zellen als Drop-Ziele zulassen
-                    if (cell.dataset.time === 'morning') {
+                    // Prüfe, ob die Drop-Zelle zur gleichen Tageszeit gehört wie die Ursprungszelle
+                    if (originalCell && originalCell.dataset.time === this.dataset.time) {
                         this.classList.add('drop-target');
                     }
                 });
@@ -208,8 +208,8 @@
                     e.preventDefault();
                     this.classList.remove('drop-target');
                     
-                    // Nur Vormittags-Zellen als Drop-Ziele zulassen
-                    if (this.dataset.time !== 'morning') {
+                    // Prüfe, ob die Drop-Zelle zur gleichen Tageszeit gehört wie die Ursprungszelle
+                    if (!originalCell || originalCell.dataset.time !== this.dataset.time) {
                         return;
                     }
 
