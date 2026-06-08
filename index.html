@@ -4,9 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stundenplan Personal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        .header-cell {
+            background-color: #2E7D32;
+            color: white;
+            font-weight: bold;
+        }
+        .morning-cell {
+            background-color: #E8F5E9;
+        }
+        .afternoon-cell {
+            background-color: #C8E6C9;
+        }
+        .employee-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .employee-list li {
+            padding: 4px;
+            border-bottom: 1px solid #ddd;
+        }
+        .employee-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p>Willkommen auf meiner Stundenplan-Personal Website.</p>
+    <div class="container">
+        <h1>Personalverteilung</h1>
+        <table id="personalTable">
+            <thead>
+                <tr>
+                    <th>Zeit</th>
+                    <th class="header-cell">1a</th>
+                    <th class="header-cell">1b</th>
+                    <th class="header-cell">1c</th>
+                    <th class="header-cell">1d</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Klasse</strong></td>
+                    <td>1a</td>
+                    <td>1b</td>
+                    <td>1c</td>
+                    <td>1d</td>
+                </tr>
+                <tr>
+                    <td><strong>Vormittag</strong></td>
+                    <td class="morning-cell">
+                        <ul class="employee-list" id="morning-1a">
+                            <li>Anna Müller</li>
+                            <li>Max Schmidt</li>
+                            <li>Lisa Bauer</li>
+                        </ul>
+                    </td>
+                    <td class="morning-cell">
+                        <ul class="employee-list" id="morning-1b">
+                            <li>Thomas Weber</li>
+                            <li>Sarah Klein</li>
+                        </ul>
+                    </td>
+                    <td class="morning-cell">
+                        <ul class="employee-list" id="morning-1c">
+                            <li>Peter Hofmann</li>
+                            <li>Julia Vogel</li>
+                            <li>David Fischer</li>
+                        </ul>
+                    </td>
+                    <td class="morning-cell">
+                        <ul class="employee-list" id="morning-1d">
+                            <li>Laura Wagner</li>
+                            <li>Michael Schulze</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Nachmittag</strong></td>
+                    <td class="afternoon-cell">
+                        <ul class="employee-list" id="afternoon-1a">
+                            <li>Markus Beck</li>
+                            <li>Sandra Hartmann</li>
+                        </ul>
+                    </td>
+                    <td class="afternoon-cell">
+                        <ul class="employee-list" id="afternoon-1b">
+                            <li>Daniel Meißner</li>
+                            <li>Nina Braun</li>
+                            <li>Florian Richter</li>
+                        </ul>
+                    </td>
+                    <td class="afternoon-cell">
+                        <ul class="employee-list" id="afternoon-1c">
+                            <li>Tobias Schäfer</li>
+                        </ul>
+                    </td>
+                    <td class="afternoon-cell">
+                        <ul class="employee-list" id="afternoon-1d">
+                            <li>Katrin Lehmann</li>
+                            <li>Andreas Köhler</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
