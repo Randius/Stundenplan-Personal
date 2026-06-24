@@ -22,6 +22,50 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+        .upload-area {
+            border: 2px dashed #4CAF50;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+        .upload-area:hover {
+            background-color: #e8f5e9;
+            border-color: #2E7D32;
+        }
+        .upload-area.drag-over {
+            background-color: #e8f5e9;
+            border-color: #4CAF50;
+            border-style: solid;
+        }
+        .upload-instructions {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .upload-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .upload-button:hover {
+            background-color: #2E7D32;
+        }
+        #fileInput {
+            display: none;
+        }
+        .file-info {
+            margin-top: 15px;
+            font-style: italic;
+            color: #666;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -75,6 +119,14 @@
         .class-1b { border-left: 4px solid #2196F3; }
         .class-1c { border-left: 4px solid #9C27B0; }
         .class-1d { border-left: 4px solid #4CAF50; }
+        .class-2a { border-left: 4px solid #FF9800; }
+        .class-2b { border-left: 4px solid #00BCD4; }
+        .class-2c { border-left: 4px solid #673AB7; }
+        .class-2d { border-left: 4px solid #8BC34A; }
+        .class-3a { border-left: 4px solid #F44336; }
+        .class-3b { border-left: 4px solid #03A9F4; }
+        .class-3c { border-left: 4px solid #7B1FA2; }
+        .class-3d { border-left: 4px solid #CDDC39; }
         .drop-target {
             background-color: #A5D6A7 !important;
             border: 2px dashed #4CAF50;
@@ -87,92 +139,241 @@
 <body>
     <div class="container">
         <h1>Personalverteilung</h1>
+        
+        <!-- Upload Bereich für CSV-Datei -->
+        <div class="upload-area" id="uploadArea">
+            <p class="upload-instructions">Ziehen Sie eine CSV-Datei hierher oder klicken Sie zum Hochladen</p>
+            <button class="upload-button" onclick="document.getElementById('fileInput').click()">CSV-Datei auswählen</button>
+            <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)">
+            <p class="file-info" id="fileInfo">Keine Datei ausgewählt</p>
+        </div>
+        
         <table id="personalTable">
-            <thead>
+            <thead id="tableHeader">
                 <tr>
                     <th>Zeit</th>
-                    <th class="header-cell">1a</th>
-                    <th class="header-cell">1b</th>
-                    <th class="header-cell">1c</th>
-                    <th class="header-cell">1d</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Klasse</strong></td>
-                    <td>1a</td>
-                    <td>1b</td>
-                    <td>1c</td>
-                    <td>1d</td>
-                </tr>
-                <tr>
-                    <td class="time-label">Vormittag</td>
-                    <td class="morning-cell" data-class="1a" data-time="morning">
-                        <ul class="employee-list" id="morning-1a">
-                            <li class="employee-item class-1a" draggable="true" data-employee="Anna Müller" data-original-class="1a">Anna Müller</li>
-                            <li class="employee-item class-1a" draggable="true" data-employee="Max Schmidt" data-original-class="1a">Max Schmidt</li>
-                            <li class="employee-item class-1a" draggable="true" data-employee="Lisa Bauer" data-original-class="1a">Lisa Bauer</li>
-                        </ul>
-                    </td>
-                    <td class="morning-cell" data-class="1b" data-time="morning">
-                        <ul class="employee-list" id="morning-1b">
-                            <li class="employee-item class-1b" draggable="true" data-employee="Thomas Weber" data-original-class="1b">Thomas Weber</li>
-                            <li class="employee-item class-1b" draggable="true" data-employee="Sarah Klein" data-original-class="1b">Sarah Klein</li>
-                        </ul>
-                    </td>
-                    <td class="morning-cell" data-class="1c" data-time="morning">
-                        <ul class="employee-list" id="morning-1c">
-                            <li class="employee-item class-1c" draggable="true" data-employee="Peter Hofmann" data-original-class="1c">Peter Hofmann</li>
-                            <li class="employee-item class-1c" draggable="true" data-employee="Julia Vogel" data-original-class="1c">Julia Vogel</li>
-                            <li class="employee-item class-1c" draggable="true" data-employee="David Fischer" data-original-class="1c">David Fischer</li>
-                        </ul>
-                    </td>
-                    <td class="morning-cell" data-class="1d" data-time="morning">
-                        <ul class="employee-list" id="morning-1d">
-                            <li class="employee-item class-1d" draggable="true" data-employee="Laura Wagner" data-original-class="1d">Laura Wagner</li>
-                            <li class="employee-item class-1d" draggable="true" data-employee="Michael Schulze" data-original-class="1d">Michael Schulze</li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="time-label">Nachmittag</td>
-                    <td class="afternoon-cell" data-class="1a" data-time="afternoon">
-                        <ul class="employee-list" id="afternoon-1a">
-                            <li class="employee-item class-1a" draggable="true" data-employee="Markus Beck" data-original-class="1a">Markus Beck</li>
-                            <li class="employee-item class-1a" draggable="true" data-employee="Sandra Hartmann" data-original-class="1a">Sandra Hartmann</li>
-                        </ul>
-                    </td>
-                    <td class="afternoon-cell" data-class="1b" data-time="afternoon">
-                        <ul class="employee-list" id="afternoon-1b">
-                            <li class="employee-item class-1b" draggable="true" data-employee="Daniel Meißner" data-original-class="1b">Daniel Meißner</li>
-                            <li class="employee-item class-1b" draggable="true" data-employee="Nina Braun" data-original-class="1b">Nina Braun</li>
-                            <li class="employee-item class-1b" draggable="true" data-employee="Florian Richter" data-original-class="1b">Florian Richter</li>
-                        </ul>
-                    </td>
-                    <td class="afternoon-cell" data-class="1c" data-time="afternoon">
-                        <ul class="employee-list" id="afternoon-1c">
-                            <li class="employee-item class-1c" draggable="true" data-employee="Tobias Schäfer" data-original-class="1c">Tobias Schäfer</li>
-                        </ul>
-                    </td>
-                    <td class="afternoon-cell" data-class="1d" data-time="afternoon">
-                        <ul class="employee-list" id="afternoon-1d">
-                            <li class="employee-item class-1d" draggable="true" data-employee="Katrin Lehmann" data-original-class="1d">Katrin Lehmann</li>
-                            <li class="employee-item class-1d" draggable="true" data-employee="Andreas Köhler" data-original-class="1d">Andreas Köhler</li>
-                        </ul>
-                    </td>
-                </tr>
+            <tbody id="tableBody">
+                <!-- Dynamisch generiert -->
             </tbody>
         </table>
     </div>
 
     <script>
-        // Drag & Drop Funktionalität
-        document.addEventListener('DOMContentLoaded', function() {
+        // Globale Variablen
+        let currentData = null;
+        let draggedItem = null;
+        let originalCell = null;
+
+        // Drag & Drop Upload für CSV-Datei
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+
+        // Drag Over Event für Upload-Bereich
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && (files[0].type === 'text/csv' || files[0].name.endsWith('.csv'))) {
+                handleFileUpload({ target: { files: files } });
+            }
+        });
+
+        // Klick auf Upload-Bereich öffnet Dateiauswahl
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        // Funktion zum Verarbeiten der hochgeladenen Datei
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fileInfo.textContent = `Geladene Datei: ${file.name}`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                parseCSV(content);
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        // Funktion zum Parsen der CSV-Datei
+        function parseCSV(content) {
+            // Entferne BOM (Byte Order Mark) falls vorhanden
+            if (content.charCodeAt(0) === 0xFEFF) {
+                content = content.slice(1);
+            }
+
+            const lines = content.split('\n');
+            if (lines.length < 3) {
+                alert('Ungültiges CSV-Format. Es werden mindestens 3 Zeilen erwartet.');
+                return;
+            }
+
+            // Parse Header (Mitarbeiternamen)
+            const employeeLine = lines[0].trim();
+            const employees = employeeLine.split(';').map(item => item.trim()).filter(item => item);
+            
+            // Entferne leere Einträge am Anfang (falls BOM oder leere Spalte)
+            if (employees.length > 0 && employees[0] === '') {
+                employees.shift();
+            }
+
+            // Parse Zeilen (Vormittag/Nachmittag)
+            const timeSlots = [];
+            const classAssignments = {};
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const parts = line.split(';').map(item => item.trim()).filter(item => item);
+                if (parts.length === 0) continue;
+                
+                const timeSlot = parts[0];
+                const classes = parts.slice(1);
+                
+                timeSlots.push(timeSlot);
+                
+                for (let j = 0; j < classes.length && j < employees.length; j++) {
+                    const className = classes[j];
+                    const employeeName = employees[j];
+                    
+                    if (!classAssignments[timeSlot]) {
+                        classAssignments[timeSlot] = {};
+                    }
+                    if (!classAssignments[timeSlot][className]) {
+                        classAssignments[timeSlot][className] = [];
+                    }
+                    
+                    classAssignments[timeSlot][className].push(employeeName);
+                }
+            }
+
+            // Speichere die Daten und generiere die Tabelle
+            currentData = {
+                employees: employees,
+                timeSlots: timeSlots,
+                assignments: classAssignments
+            };
+
+            generateTable();
+            setupDragAndDrop();
+        }
+
+        // Funktion zum Generieren der Tabelle
+        function generateTable() {
+            if (!currentData) return;
+
+            const header = document.getElementById('tableHeader');
+            const body = document.getElementById('tableBody');
+
+            // Header generieren
+            header.innerHTML = '<tr><th>Zeit</th>';
+            
+            // Sammle alle einzigartigen Klassen
+            const allClasses = new Set();
+            for (const timeSlot of currentData.timeSlots) {
+                for (const className of Object.keys(currentData.assignments[timeSlot])) {
+                    allClasses.add(className);
+                }
+            }
+
+            // Sortiere Klassen (1a, 1b, 1c, 1d, etc.)
+            const sortedClasses = Array.from(allClasses).sort((a, b) => {
+                // Einfache Sortierung nach Klassennamen
+                return a.localeCompare(b, undefined, { numeric: true });
+            });
+
+            // Header-Zellen für Klassen
+            for (const className of sortedClasses) {
+                header.innerHTML += `<th class="header-cell">${className}</th>`;
+            }
+            header.innerHTML += '</tr>';
+
+            // Klassenzeile (Klassenname unter jedem Header)
+            let classRow = '<tr><td><strong>Klasse</strong></td>';
+            for (const className of sortedClasses) {
+                classRow += `<td>${className}</td>`;
+            }
+            classRow += '</tr>';
+
+            // Tabelle Körper generieren
+            body.innerHTML = classRow;
+
+            // Für jede Tageszeit eine Zeile
+            for (const timeSlot of currentData.timeSlots) {
+                const timeSlotDe = timeSlot === 'Vormittag' ? 'Vormittag' : 
+                                   timeSlot === 'Nachmittag' ? 'Nachmittag' : 
+                                   timeSlot;
+                const cellClass = timeSlot === 'Vormittag' ? 'morning-cell' : 'afternoon-cell';
+                const timeDe = timeSlot === 'Vormittag' ? 'Vormittag' : 'Nachmittag';
+                
+                let row = `<tr><td class="time-label">${timeDe}</td>`;
+                
+                for (const className of sortedClasses) {
+                    const employeesInClass = currentData.assignments[timeSlot] && currentData.assignments[timeSlot][className] ? 
+                                            currentData.assignments[timeSlot][className] : [];
+                    
+                    const cellId = `${timeSlot.toLowerCase()}-${className}`;
+                    const classColor = getClassColor(className);
+                    
+                    row += `<td class="${cellClass}" data-class="${className}" data-time="${timeSlot.toLowerCase()}">`;
+                    row += `<ul class="employee-list" id="${cellId}">`;
+                    
+                    for (const employee of employeesInClass) {
+                        row += `<li class="employee-item ${classColor}" draggable="true" data-employee="${employee}" data-original-class="${className}">${employee}</li>`;
+                    }
+                    
+                    row += '</ul></td>';
+                }
+                
+                row += '</tr>';
+                body.innerHTML += row;
+            }
+        }
+
+        // Funktion zum Bestimmen der Klassenfarbe
+        function getClassColor(className) {
+            const colors = {
+                '1a': 'class-1a',
+                '1b': 'class-1b',
+                '1c': 'class-1c',
+                '1d': 'class-1d',
+                '2a': 'class-2a',
+                '2b': 'class-2b',
+                '2c': 'class-2c',
+                '2d': 'class-2d',
+                '3a': 'class-3a',
+                '3b': 'class-3b',
+                '3c': 'class-3c',
+                '3d': 'class-3d'
+            };
+            return colors[className.toLowerCase()] || 'class-1a';
+        }
+
+        // Drag & Drop Funktionalität für Mitarbeiter
+        function setupDragAndDrop() {
             const employeeItems = document.querySelectorAll('.employee-item');
             const cells = document.querySelectorAll('td[data-class][data-time]');
-
-            let draggedItem = null;
-            let originalCell = null;
 
             // Drag Start
             employeeItems.forEach(item => {
@@ -229,6 +430,21 @@
                     }
                 });
             });
+        }
+
+        // Initialisierung beim Laden der Seite
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lade die Beispieldatei automatisch beim Start
+            fetch('Stundenplan_Montag.csv')
+                .then(response => response.text())
+                .then(content => {
+                    parseCSV(content);
+                })
+                .catch(error => {
+                    console.log('Beispieldatei konnte nicht geladen werden:', error);
+                    // Zeige eine Nachricht an
+                    fileInfo.textContent = 'Laden Sie eine CSV-Datei hoch, um zu beginnen';
+                });
         });
     </script>
 </body>
