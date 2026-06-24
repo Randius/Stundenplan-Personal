@@ -222,44 +222,46 @@
                 content = content.slice(1);
             }
 
-            const lines = content.split('\n');
-            if (lines.length < 3) {
-                alert('Ungültiges CSV-Format. Es werden mindestens 3 Zeilen erwartet.');
+            // Normalisiere Zeilenenden (Windows \r\n -> \n)
+            content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+            const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+            if (lines.length < 2) {
+                alert('Ungültiges CSV-Format. Es werden mindestens 2 Zeilen erwartet (Header + Daten).');
                 return;
             }
 
-            // Parse Header (Mitarbeiternamen)
-            const employeeLine = lines[0].trim();
-            const employees = employeeLine.split(';').map(item => item.trim()).filter(item => item);
+            // Parse Header (Mitarbeiternamen) - erste Zeile
+            // Entferne leere erste Spalte falls vorhanden (wie in der Beispieldatei)
+            const headerParts = lines[0].split(';').map(item => item.trim());
+            const employees = headerParts.slice(headerParts[0] === '' ? 1 : 0).filter(item => item);
             
-            // Entferne leere Einträge am Anfang (falls BOM oder leere Spalte)
-            if (employees.length > 0 && employees[0] === '') {
-                employees.shift();
-            }
-
-            // Parse Zeilen (Vormittag/Nachmittag)
+            // Parse Datenzeilen (ab Zeile 1)
             const timeSlots = [];
             const classAssignments = {};
             
             for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                
-                const parts = line.split(';').map(item => item.trim()).filter(item => item);
+                const parts = lines[i].split(';').map(item => item.trim());
                 if (parts.length === 0) continue;
                 
-                const timeSlot = parts[0];
-                const classes = parts.slice(1);
+                // Erste Spalte ist die Tageszeit (kann leer sein, dann nimm die zweite)
+                const timeSlot = parts[0] || parts[1];
+                // Rest sind die Klassenzuordnungen für jeden Mitarbeiter
+                // Falls erste Spalte leer war, starte bei Index 2, sonst bei 1
+                const classes = parts.slice(parts[0] === '' ? 2 : 1);
+                
+                if (!timeSlot) continue;
                 
                 timeSlots.push(timeSlot);
+                classAssignments[timeSlot] = {};
                 
-                for (let j = 0; j < classes.length && j < employees.length; j++) {
+                // Jeder Mitarbeiter bekommt eine Klasse zugewiesen
+                for (let j = 0; j < Math.min(classes.length, employees.length); j++) {
                     const className = classes[j];
                     const employeeName = employees[j];
                     
-                    if (!classAssignments[timeSlot]) {
-                        classAssignments[timeSlot] = {};
-                    }
+                    if (!className || !employeeName) continue;
+                    
                     if (!classAssignments[timeSlot][className]) {
                         classAssignments[timeSlot][className] = [];
                     }
@@ -275,6 +277,7 @@
                 assignments: classAssignments
             };
 
+            fileInfo.textContent = `Geladene Datei: ${employees.length} Mitarbeiter, ${timeSlots.length} Zeitslots`;
             generateTable();
             setupDragAndDrop();
         }
