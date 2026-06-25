@@ -70,7 +70,7 @@ h1 {
 /* Settings Grid für nebeneinander liegende Elemente */
 .settings-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
 }
 
@@ -159,6 +159,55 @@ h1 {
 
 .missing-employee .remove-missing:hover {
     color: #d32f2f;
+}
+
+/* Verschiebungen Bereich */
+.moves-section {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.moves-section h3 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.moves-list {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    padding: 5px;
+}
+
+.move-entry {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.move-entry .move-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.move-entry .move-info {
+    flex-grow: 1;
+}
+
+.move-entry .move-time {
+    font-weight: bold;
+    margin-right: 5px;
 }
 
 .container {

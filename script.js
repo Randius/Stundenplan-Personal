@@ -3,6 +3,9 @@ let currentData = null;
 let draggedItem = null;
 let originalCell = null;
 let missingEmployees = new Set();
+let employeeMoves = []; // Liste der Verschiebungen: { employee, fromClass, toClass, timeSlot }
+let sortedClasses = []; // Global verfügbare Liste der sortierten Klassen
+let classColorMap = {}; // Global verfügbare Map für Klassenname zu Farbindex
 
 // Funktion zum Ein- und Ausklappen der Einstellungen
 function toggleSettings() {
@@ -97,6 +100,61 @@ function updateTableVisibility() {
             item.style.display = 'list-item';
         }
     });
+}
+
+// Funktion zum Hinzufügen einer Verschiebung
+function addEmployeeMove(employee, fromClass, toClass, timeSlot) {
+    employeeMoves.push({
+        employee: employee,
+        fromClass: fromClass,
+        toClass: toClass,
+        timeSlot: timeSlot
+    });
+    updateMovesList();
+}
+
+// Funktion zum Aktualisieren der Verschiebungen-Liste
+function updateMovesList() {
+    const movesList = document.getElementById('movesList');
+    movesList.innerHTML = '';
+    
+    // Sortiere nach Zeit und dann nach Mitarbeiter
+    const sortedMoves = [...employeeMoves].sort((a, b) => {
+        if (a.timeSlot !== b.timeSlot) {
+            return a.timeSlot.localeCompare(b.timeSlot);
+        }
+        return a.employee.localeCompare(b.employee);
+    });
+    
+    sortedMoves.forEach(move => {
+        const div = document.createElement('div');
+        div.className = 'move-entry';
+        
+        // Farbindex für die Klasse bestimmen
+        const classIndex = sortedClasses.indexOf(move.toClass) % 25;
+        const color = getColorForIndex(classIndex);
+        
+        div.innerHTML = `
+            <div class="move-color" style="background-color: ${color}"></div>
+            <div class="move-info">
+                <span class="move-time">${move.timeSlot === 'Vormittag' ? 'Vorm.' : 'Nachm.'}</span>
+                <span>${move.employee} → ${move.toClass}</span>
+            </div>
+        `;
+        movesList.appendChild(div);
+    });
+}
+
+// Funktion zum Abrufen der Farbe für einen Index
+function getColorForIndex(index) {
+    const colors = [
+        '#FF5722', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
+        '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
+        '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800',
+        '#FF5722', '#F44336', '#E53935', '#D32F2F', '#B71C1C',
+        '#795548', '#607D8B', '#546E7A', '#455A64', '#37474F'
+    ];
+    return colors[index % colors.length];
 }
 
 
@@ -200,13 +258,13 @@ function generateTable() {
     }
 
     // Sortiere Klassen (1a, 1b, 1c, 1d, etc.)
-    const sortedClasses = Array.from(allClasses).sort((a, b) => {
+    sortedClasses = Array.from(allClasses).sort((a, b) => {
         // Einfache Sortierung nach Klassennamen
         return a.localeCompare(b, undefined, { numeric: true });
     });
 
     // Erstelle eine Map für Klassenname zu Farbindex
-    const classColorMap = {};
+    classColorMap = {};
     for (let i = 0; i < sortedClasses.length; i++) {
         classColorMap[sortedClasses[i]] = i % 25;
     }
@@ -310,6 +368,14 @@ function setupDragAndDrop() {
             }
 
             if (draggedItem) {
+                const employeeName = draggedItem.dataset.employee;
+                const fromClass = originalCell.dataset.class;
+                const toClass = this.dataset.class;
+                const timeSlot = this.dataset.time;
+                
+                // Füge die Verschiebung zur Liste hinzu
+                addEmployeeMove(employeeName, fromClass, toClass, timeSlot);
+                
                 // Entferne den Mitarbeiter aus der ursprünglichen Zelle
                 draggedItem.remove();
                 
