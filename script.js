@@ -105,22 +105,36 @@ function updateTableVisibility() {
 
 // Funktion zum Aktualisieren der effektiven Verschiebungen
 function updateEffectiveMoves() {
+    console.log('updateEffectiveMoves aufgerufen');
+    console.log('currentData:', !!currentData);
+    console.log('originalAssignments:', originalAssignments);
+    console.log('sortedClasses:', sortedClasses);
+    
     if (!currentData || !originalAssignments || !sortedClasses || sortedClasses.length === 0) {
+        console.log('Fehlende Daten - Abbruch');
         return;
     }
     
     // Aktuelle Zuordnungen aus der Tabelle lesen
     const currentAssignments = {};
-    document.querySelectorAll('td[data-class][data-time] .employee-item').forEach(item => {
+    const employeeItems = document.querySelectorAll('td[data-class][data-time] .employee-item');
+    console.log('Gefundene Mitarbeiter-Items:', employeeItems.length);
+    
+    employeeItems.forEach(item => {
         const employee = item.dataset.employee;
         const className = item.parentElement.parentElement.dataset.class;
         const timeSlot = item.parentElement.parentElement.dataset.time;
+        
+        console.log(`Mitarbeiter: ${employee}, Klasse: ${className}, Zeit: ${timeSlot}`);
         
         if (!currentAssignments[employee]) {
             currentAssignments[employee] = {};
         }
         currentAssignments[employee][timeSlot] = className;
     });
+    
+    console.log('Aktuelle Zuordnungen:', currentAssignments);
+    console.log('Ursprüngliche Zuordnungen:', originalAssignments);
     
     // Effektive Verschiebungen berechnen
     effectiveMoves = [];
@@ -129,7 +143,10 @@ function updateEffectiveMoves() {
             const currentClass = currentAssignments[employee][timeSlot];
             const originalClass = originalAssignments[employee]?.[timeSlot];
             
+            console.log(`Vergleiche ${employee} ${timeSlot}: ${originalClass} vs ${currentClass}`);
+            
             if (originalClass && currentClass !== originalClass) {
+                console.log(`Verschiebung gefunden: ${employee}: ${originalClass} → ${currentClass}`);
                 effectiveMoves.push({
                     employee: employee,
                     fromClass: originalClass,
@@ -140,6 +157,7 @@ function updateEffectiveMoves() {
         }
     }
     
+    console.log('Effektive Verschiebungen:', effectiveMoves);
     updateMovesList();
 }
 
