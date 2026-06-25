@@ -293,7 +293,7 @@
             const body = document.getElementById('tableBody');
 
             // Header generieren
-            header.innerHTML = '<tr><th>Zeit</th>';
+            header.innerHTML = '<tr>';
             
             // Sammle alle einzigartigen Klassen
             const allClasses = new Set();
@@ -315,15 +315,8 @@
             }
             header.innerHTML += '</tr>';
 
-            // Klassenzeile (Klassenname unter jedem Header)
-            let classRow = '<tr><td><strong>Klasse</strong></td>';
-            for (const className of sortedClasses) {
-                classRow += `<td>${className}</td>`;
-            }
-            classRow += '</tr>';
-
             // Tabelle Körper generieren
-            body.innerHTML = classRow;
+            body.innerHTML = '';
 
             // Für jede Tageszeit eine Zeile
             for (const timeSlot of currentData.timeSlots) {
@@ -333,7 +326,7 @@
                 const cellClass = timeSlot === 'Vormittag' ? 'morning-cell' : 'afternoon-cell';
                 const timeDe = timeSlot === 'Vormittag' ? 'Vormittag' : 'Nachmittag';
                 
-                let row = `<tr><td class="time-label">${timeDe}</td>`;
+                let row = `<tr>`;
                 
                 for (const className of sortedClasses) {
                     const employeesInClass = currentData.assignments[timeSlot] && currentData.assignments[timeSlot][className] ? 
