@@ -72,6 +72,14 @@ h1 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.settings-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px;
 }
 
 /* Fehlend melden Bereich */

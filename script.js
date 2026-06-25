@@ -3,7 +3,8 @@ let currentData = null;
 let draggedItem = null;
 let originalCell = null;
 let missingEmployees = new Set();
-let employeeMoves = []; // Liste der Verschiebungen: { employee, fromClass, toClass, timeSlot }
+let originalAssignments = {}; // Ursprüngliche Klassenzuordnungen: { employee: { timeSlot: className } }
+let effectiveMoves = []; // Liste der effektiven Verschiebungen: { employee, fromClass, toClass, timeSlot }
 let sortedClasses = []; // Global verfügbare Liste der sortierten Klassen
 let classColorMap = {}; // Global verfügbare Map für Klassenname zu Farbindex
 
@@ -102,14 +103,41 @@ function updateTableVisibility() {
     });
 }
 
-// Funktion zum Hinzufügen einer Verschiebung
-function addEmployeeMove(employee, fromClass, toClass, timeSlot) {
-    employeeMoves.push({
-        employee: employee,
-        fromClass: fromClass,
-        toClass: toClass,
-        timeSlot: timeSlot
+// Funktion zum Aktualisieren der effektiven Verschiebungen
+function updateEffectiveMoves() {
+    if (!currentData || !originalAssignments) return;
+    
+    // Aktuelle Zuordnungen aus der Tabelle lesen
+    const currentAssignments = {};
+    document.querySelectorAll('td[data-class][data-time] .employee-item').forEach(item => {
+        const employee = item.dataset.employee;
+        const className = item.parentElement.parentElement.dataset.class;
+        const timeSlot = item.parentElement.parentElement.dataset.time;
+        
+        if (!currentAssignments[employee]) {
+            currentAssignments[employee] = {};
+        }
+        currentAssignments[employee][timeSlot] = className;
     });
+    
+    // Effektive Verschiebungen berechnen
+    effectiveMoves = [];
+    for (const employee in currentAssignments) {
+        for (const timeSlot in currentAssignments[employee]) {
+            const currentClass = currentAssignments[employee][timeSlot];
+            const originalClass = originalAssignments[employee]?.[timeSlot];
+            
+            if (originalClass && currentClass !== originalClass) {
+                effectiveMoves.push({
+                    employee: employee,
+                    fromClass: originalClass,
+                    toClass: currentClass,
+                    timeSlot: timeSlot
+                });
+            }
+        }
+    }
+    
     updateMovesList();
 }
 
@@ -119,7 +147,7 @@ function updateMovesList() {
     movesList.innerHTML = '';
     
     // Sortiere nach Zeit und dann nach Mitarbeiter
-    const sortedMoves = [...employeeMoves].sort((a, b) => {
+    const sortedMoves = [...effectiveMoves].sort((a, b) => {
         if (a.timeSlot !== b.timeSlot) {
             return a.timeSlot.localeCompare(b.timeSlot);
         }
@@ -130,7 +158,7 @@ function updateMovesList() {
         const div = document.createElement('div');
         div.className = 'move-entry';
         
-        // Farbindex für die Klasse bestimmen
+        // Farbindex für die Zielklasse bestimmen
         const classIndex = sortedClasses.indexOf(move.toClass) % 25;
         const color = getColorForIndex(classIndex);
         
@@ -138,7 +166,7 @@ function updateMovesList() {
             <div class="move-color" style="background-color: ${color}"></div>
             <div class="move-info">
                 <span class="move-time">${move.timeSlot === 'Vormittag' ? 'Vorm.' : 'Nachm.'}</span>
-                <span>${move.employee} → ${move.toClass}</span>
+                <span>${move.employee}: ${move.fromClass} → ${move.toClass}</span>
             </div>
         `;
         movesList.appendChild(div);
@@ -226,6 +254,12 @@ function parseCSV(content) {
             }
             
             classAssignments[timeSlot][className].push(employeeName);
+            
+            // Speichere die ursprüngliche Zuordnung
+            if (!originalAssignments[employeeName]) {
+                originalAssignments[employeeName] = {};
+            }
+            originalAssignments[employeeName][timeSlot] = className;
         }
     }
 
@@ -239,6 +273,10 @@ function parseCSV(content) {
     fileInfo.textContent = `Geladene Datei: ${employees.length} Mitarbeiter, ${timeSlots.length} Zeitslots`;
     generateTable();
     setupDragAndDrop();
+    
+    // Setze effektive Verschiebungen zurück
+    effectiveMoves = [];
+    updateMovesList();
 }
 
 // Funktion zum Generieren der Tabelle
@@ -368,14 +406,6 @@ function setupDragAndDrop() {
             }
 
             if (draggedItem) {
-                const employeeName = draggedItem.dataset.employee;
-                const fromClass = originalCell.dataset.class;
-                const toClass = this.dataset.class;
-                const timeSlot = this.dataset.time;
-                
-                // Füge die Verschiebung zur Liste hinzu
-                addEmployeeMove(employeeName, fromClass, toClass, timeSlot);
-                
                 // Entferne den Mitarbeiter aus der ursprünglichen Zelle
                 draggedItem.remove();
                 
@@ -384,6 +414,9 @@ function setupDragAndDrop() {
                 if (newList) {
                     newList.appendChild(draggedItem);
                 }
+                
+                // Aktualisiere die Liste der effektiven Verschiebungen
+                setTimeout(updateEffectiveMoves, 100);
             }
         });
     });
