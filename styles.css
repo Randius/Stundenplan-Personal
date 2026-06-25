@@ -57,7 +57,7 @@ h1 {
 .settings-content {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 15px;
+    padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
     border: 1px solid #ddd;
@@ -71,13 +71,11 @@ h1 {
 /* Upload-Bereich in der Breite begrenzen */
 .upload-area {
     width: 100%;
-    margin: 0 auto;
 }
 
 /* Fehlend melden Bereich */
 .missing-section {
     width: 100%;
-    margin: 0 auto;
 }
 
 .missing-section h3 {
@@ -164,7 +162,6 @@ h1 {
 /* Verschiebungen Bereich */
 .moves-section {
     width: 100%;
-    margin: 0 auto;
 }
 
 .moves-section h3 {
