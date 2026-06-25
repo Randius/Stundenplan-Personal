@@ -19,6 +19,54 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* Einstellungen-Sektion */
+.settings-section {
+    margin-bottom: 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.settings-toggle {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.3s;
+}
+
+.settings-toggle:hover {
+    background-color: #2E7D32;
+}
+
+.settings-content {
+    max-width: 600px;
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+.settings-content.hidden {
+    display: none;
+}
+
+/* Upload-Bereich in der Breite begrenzen */
+.upload-area {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
 .container {
     max-width: 100%;
     margin: 0 auto;

@@ -9,14 +9,22 @@
 <body>
     <div class="container">
         <h1>Personalverteilung</h1>
-        <p class="version">Version: 0.0.8</p>
+        <p class="version">Version: 0.0.9</p>
         
-        <!-- Upload Bereich für CSV-Datei -->
-        <div class="upload-area" id="uploadArea">
-            <p class="upload-instructions">Ziehen Sie eine CSV-Datei hierher oder klicken Sie zum Hochladen</p>
-            <button class="upload-button" onclick="document.getElementById('fileInput').click()">CSV-Datei auswählen</button>
-            <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)">
-            <p class="file-info" id="fileInfo">Keine Datei ausgewählt</p>
+        <!-- Einstellungen (einklappbar) -->
+        <div class="settings-section">
+            <button class="settings-toggle" id="settingsToggle" onclick="toggleSettings()">
+                ⚙️ Einstellungen
+            </button>
+            <div class="settings-content" id="settingsContent">
+                <!-- Upload Bereich für CSV-Datei -->
+                <div class="upload-area" id="uploadArea">
+                    <p class="upload-instructions">Ziehen Sie eine CSV-Datei hierher oder klicken Sie zum Hochladen</p>
+                    <button class="upload-button" onclick="document.getElementById('fileInput').click()">CSV-Datei auswählen</button>
+                    <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)">
+                    <p class="file-info" id="fileInfo">Keine Datei ausgewählt</p>
+                </div>
+            </div>
         </div>
         
         <div class="table-container">

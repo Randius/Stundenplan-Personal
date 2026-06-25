@@ -3,39 +3,21 @@ let currentData = null;
 let draggedItem = null;
 let originalCell = null;
 
-// Drag & Drop Upload für CSV-Datei
-const uploadArea = document.getElementById('uploadArea');
-const fileInput = document.getElementById('fileInput');
-const fileInfo = document.getElementById('fileInfo');
-
-// Drag Over Event für Upload-Bereich
-uploadArea.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    this.classList.add('drag-over');
-});
-
-uploadArea.addEventListener('dragleave', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    this.classList.remove('drag-over');
-});
-
-uploadArea.addEventListener('drop', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    this.classList.remove('drag-over');
+// Funktion zum Ein- und Ausklappen der Einstellungen
+function toggleSettings() {
+    const settingsContent = document.getElementById('settingsContent');
+    const settingsToggle = document.getElementById('settingsToggle');
     
-    const files = e.dataTransfer.files;
-    if (files.length > 0 && (files[0].type === 'text/csv' || files[0].name.endsWith('.csv'))) {
-        handleFileUpload({ target: { files: files } });
+    if (settingsContent.classList.contains('hidden')) {
+        settingsContent.classList.remove('hidden');
+        settingsToggle.textContent = '⚙️ Einstellungen ausblenden';
+    } else {
+        settingsContent.classList.add('hidden');
+        settingsToggle.textContent = '⚙️ Einstellungen einblenden';
     }
-});
+}
 
-// Klick auf Upload-Bereich öffnet Dateiauswahl
-uploadArea.addEventListener('click', function() {
-    fileInput.click();
-});
+
 
 // Funktion zum Verarbeiten der hochgeladenen Datei
 function handleFileUpload(event) {
@@ -261,6 +243,40 @@ function setupDragAndDrop() {
 
 // Initialisierung beim Laden der Seite
 document.addEventListener('DOMContentLoaded', function() {
+    // Drag & Drop Upload für CSV-Datei
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+
+    // Drag Over Event für Upload-Bereich
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.add('drag-over');
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.remove('drag-over');
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && (files[0].type === 'text/csv' || files[0].name.endsWith('.csv'))) {
+            handleFileUpload({ target: { files: files } });
+        }
+    });
+
+    // Klick auf Upload-Bereich öffnet Dateiauswahl
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
     // Lade die Beispieldatei automatisch beim Start
     fetch('Stundenplan_Montag.csv')
         .then(response => response.text())
