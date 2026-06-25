@@ -106,19 +106,32 @@ th {
     font-weight: bold;
 }
 
-/* Header-Zellen mit Klassenfarben */
-.header-cell.class-1a { background-color: #FF5722; color: white; font-weight: bold; }
-.header-cell.class-1b { background-color: #2196F3; color: white; font-weight: bold; }
-.header-cell.class-1c { background-color: #9C27B0; color: white; font-weight: bold; }
-.header-cell.class-1d { background-color: #4CAF50; color: white; font-weight: bold; }
-.header-cell.class-2a { background-color: #FF9800; color: white; font-weight: bold; }
-.header-cell.class-2b { background-color: #00BCD4; color: white; font-weight: bold; }
-.header-cell.class-2c { background-color: #673AB7; color: white; font-weight: bold; }
-.header-cell.class-2d { background-color: #8BC34A; color: white; font-weight: bold; }
-.header-cell.class-3a { background-color: #F44336; color: white; font-weight: bold; }
-.header-cell.class-3b { background-color: #03A9F4; color: white; font-weight: bold; }
-.header-cell.class-3c { background-color: #7B1FA2; color: white; font-weight: bold; }
-.header-cell.class-3d { background-color: #CDDC39; color: black; font-weight: bold; }
+/* 25 gut unterscheidbare Farben für Klassenspalten */
+.color-0 { background-color: #FF5722; color: white; font-weight: bold; }
+.color-1 { background-color: #E91E63; color: white; font-weight: bold; }
+.color-2 { background-color: #9C27B0; color: white; font-weight: bold; }
+.color-3 { background-color: #673AB7; color: white; font-weight: bold; }
+.color-4 { background-color: #3F51B5; color: white; font-weight: bold; }
+.color-5 { background-color: #2196F3; color: white; font-weight: bold; }
+.color-6 { background-color: #03A9F4; color: white; font-weight: bold; }
+.color-7 { background-color: #00BCD4; color: white; font-weight: bold; }
+.color-8 { background-color: #009688; color: white; font-weight: bold; }
+.color-9 { background-color: #4CAF50; color: white; font-weight: bold; }
+.color-10 { background-color: #8BC34A; color: black; font-weight: bold; }
+.color-11 { background-color: #CDDC39; color: black; font-weight: bold; }
+.color-12 { background-color: #FFEB3B; color: black; font-weight: bold; }
+.color-13 { background-color: #FFC107; color: black; font-weight: bold; }
+.color-14 { background-color: #FF9800; color: white; font-weight: bold; }
+.color-15 { background-color: #FF5722; color: white; font-weight: bold; }
+.color-16 { background-color: #F44336; color: white; font-weight: bold; }
+.color-17 { background-color: #E53935; color: white; font-weight: bold; }
+.color-18 { background-color: #D32F2F; color: white; font-weight: bold; }
+.color-19 { background-color: #B71C1C; color: white; font-weight: bold; }
+.color-20 { background-color: #795548; color: white; font-weight: bold; }
+.color-21 { background-color: #607D8B; color: white; font-weight: bold; }
+.color-22 { background-color: #546E7A; color: white; font-weight: bold; }
+.color-23 { background-color: #455A64; color: white; font-weight: bold; }
+.color-24 { background-color: #37474F; color: white; font-weight: bold; }
 
 .morning-cell {
     background-color: #E8F5E9;

@@ -141,11 +141,18 @@ function generateTable() {
         return a.localeCompare(b, undefined, { numeric: true });
     });
 
+    // Erstelle eine Map für Klassenname zu Farbindex
+    const classColorMap = {};
+    for (let i = 0; i < sortedClasses.length; i++) {
+        classColorMap[sortedClasses[i]] = i % 25;
+    }
+
     // Header-Zellen für Klassen in einer einzigen Zeile
     let headerRow = '<tr>';
-    for (const className of sortedClasses) {
-        const classColor = getClassColor(className);
-        headerRow += `<th class="header-cell ${classColor}">${className}</th>`;
+    for (let i = 0; i < sortedClasses.length; i++) {
+        const className = sortedClasses[i];
+        const colorIndex = classColorMap[className];
+        headerRow += `<th class="header-cell color-${colorIndex}">${className}</th>`;
     }
     headerRow += '</tr>';
     header.innerHTML = headerRow;
@@ -168,13 +175,13 @@ function generateTable() {
                                     currentData.assignments[timeSlot][className] : [];
             
             const cellId = `${timeSlot.toLowerCase()}-${className}`;
-            const classColor = getClassColor(className);
+            const colorIndex = classColorMap[className];
             
             row += `<td class="${cellClass}" data-class="${className}" data-time="${timeSlot.toLowerCase()}">`;
             row += `<ul class="employee-list" id="${cellId}">`;
             
             for (const employee of employeesInClass) {
-                row += `<li class="employee-item ${classColor}" draggable="true" data-employee="${employee}" data-original-class="${className}">${employee}</li>`;
+                row += `<li class="employee-item color-${colorIndex}" draggable="true" data-employee="${employee}" data-original-class="${className}">${employee}</li>`;
             }
             
             row += '</ul></td>';
@@ -185,23 +192,9 @@ function generateTable() {
     }
 }
 
-// Funktion zum Bestimmen der Klassenfarbe
-function getClassColor(className) {
-    const colors = {
-        '1a': 'class-1a',
-        '1b': 'class-1b',
-        '1c': 'class-1c',
-        '1d': 'class-1d',
-        '2a': 'class-2a',
-        '2b': 'class-2b',
-        '2c': 'class-2c',
-        '2d': 'class-2d',
-        '3a': 'class-3a',
-        '3b': 'class-3b',
-        '3c': 'class-3c',
-        '3d': 'class-3d'
-    };
-    return colors[className.toLowerCase()] || 'class-1a';
+// Funktion zum Bestimmen der Farbklasse basierend auf dem Index
+function getColorClass(index) {
+    return `color-${index % 25}`;
 }
 
 // Drag & Drop Funktionalität für Mitarbeiter
