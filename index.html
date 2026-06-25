@@ -290,8 +290,6 @@
             const body = document.getElementById('tableBody');
 
             // Header generieren
-            header.innerHTML = '<tr>';
-            
             // Sammle alle einzigartigen Klassen
             const allClasses = new Set();
             for (const timeSlot of currentData.timeSlots) {
@@ -306,11 +304,13 @@
                 return a.localeCompare(b, undefined, { numeric: true });
             });
 
-            // Header-Zellen für Klassen
+            // Header-Zellen für Klassen in einer einzigen Zeile
+            let headerRow = '<tr>';
             for (const className of sortedClasses) {
-                header.innerHTML += `<th class="header-cell">${className}</th>`;
+                headerRow += `<th class="header-cell">${className}</th>`;
             }
-            header.innerHTML += '</tr>';
+            headerRow += '</tr>';
+            header.innerHTML = headerRow;
 
             // Tabelle Körper generieren
             body.innerHTML = '';
