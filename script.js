@@ -2,6 +2,7 @@
 let currentData = null;
 let draggedItem = null;
 let originalCell = null;
+let missingEmployees = new Set();
 
 // Funktion zum Ein- und Ausklappen der Einstellungen
 function toggleSettings() {
@@ -15,6 +16,87 @@ function toggleSettings() {
         settingsContent.classList.add('hidden');
         settingsToggle.textContent = '⚙️ Einstellungen einblenden';
     }
+}
+
+// Funktion zum Filtern der Mitarbeiter für Autocomplete
+function filterEmployees(input) {
+    if (!currentData || !currentData.employees) return [];
+    
+    const query = input.toLowerCase();
+    return currentData.employees.filter(employee => 
+        employee.toLowerCase().includes(query) && !missingEmployees.has(employee)
+    );
+}
+
+// Funktion zum Anzeigen der Autocomplete-Vorschläge
+function showSuggestions(suggestions) {
+    const suggestionsContainer = document.getElementById('missingEmployeeSuggestions');
+    suggestionsContainer.innerHTML = '';
+    
+    if (suggestions.length === 0) {
+        suggestionsContainer.classList.remove('show');
+        return;
+    }
+    
+    suggestions.forEach(employee => {
+        const div = document.createElement('div');
+        div.textContent = employee;
+        div.onclick = () => {
+            addMissingEmployee(employee);
+            suggestionsContainer.classList.remove('show');
+            document.getElementById('missingEmployeeInput').value = '';
+        };
+        suggestionsContainer.appendChild(div);
+    });
+    
+    suggestionsContainer.classList.add('show');
+}
+
+// Funktion zum Hinzufügen eines fehlenden Mitarbeiters
+function addMissingEmployee(employeeName) {
+    if (!missingEmployees.has(employeeName)) {
+        missingEmployees.add(employeeName);
+        updateMissingEmployeesList();
+        updateTableVisibility();
+    }
+}
+
+// Funktion zum Entfernen eines fehlenden Mitarbeiters
+function removeMissingEmployee(employeeName) {
+    missingEmployees.delete(employeeName);
+    updateMissingEmployeesList();
+    updateTableVisibility();
+}
+
+// Funktion zum Aktualisieren der Liste der fehlenden Mitarbeiter
+function updateMissingEmployeesList() {
+    const missingList = document.getElementById('missingEmployeesList');
+    missingList.innerHTML = '';
+    
+    missingEmployees.forEach(employee => {
+        const div = document.createElement('div');
+        div.className = 'missing-employee';
+        div.innerHTML = `
+            ${employee}
+            <span class="remove-missing" onclick="removeMissingEmployee('${employee}')">×</span>
+        `;
+        missingList.appendChild(div);
+    });
+}
+
+// Funktion zum Aktualisieren der Tabellensichtbarkeit
+function updateTableVisibility() {
+    if (!currentData) return;
+    
+    // Alle Mitarbeiter-Labels durchgehen und fehlende ausblenden
+    document.querySelectorAll('.employee-item').forEach(item => {
+        const employeeName = item.dataset.employee;
+        if (missingEmployees.has(employeeName)) {
+            item.style.display = 'none';
+        } else {
+            item.style.display = 'list-item';
+        }
+    });
 }
 
 
@@ -247,6 +329,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
     const fileInfo = document.getElementById('fileInfo');
+    
+    // Autocomplete für fehlende Mitarbeiter
+    const missingEmployeeInput = document.getElementById('missingEmployeeInput');
+    let autocompleteTimeout;
+    
+    missingEmployeeInput.addEventListener('input', function() {
+        clearTimeout(autocompleteTimeout);
+        autocompleteTimeout = setTimeout(() => {
+            const suggestions = filterEmployees(this.value);
+            showSuggestions(suggestions);
+        }, 200);
+    });
+    
+    missingEmployeeInput.addEventListener('blur', function() {
+        setTimeout(() => {
+            document.getElementById('missingEmployeeSuggestions').classList.remove('show');
+        }, 200);
+    });
+    
+    missingEmployeeInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const suggestions = filterEmployees(this.value);
+            if (suggestions.length > 0) {
+                addMissingEmployee(suggestions[0]);
+                this.value = '';
+                document.getElementById('missingEmployeeSuggestions').classList.remove('show');
+            }
+        }
+    });
 
     // Drag Over Event für Upload-Bereich
     uploadArea.addEventListener('dragover', function(e) {

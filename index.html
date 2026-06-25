@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h1>Personalverteilung</h1>
-        <p class="version">Version: 0.0.9</p>
+        <p class="version">Version: 0.0.10</p>
         
         <!-- Einstellungen (einklappbar) -->
         <div class="settings-section">
@@ -17,12 +17,22 @@
                 ⚙️ Einstellungen
             </button>
             <div class="settings-content" id="settingsContent">
-                <!-- Upload Bereich für CSV-Datei -->
-                <div class="upload-area" id="uploadArea">
-                    <p class="upload-instructions">Ziehen Sie eine CSV-Datei hierher oder klicken Sie zum Hochladen</p>
-                    <button class="upload-button" onclick="document.getElementById('fileInput').click()">CSV-Datei auswählen</button>
-                    <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)">
-                    <p class="file-info" id="fileInfo">Keine Datei ausgewählt</p>
+                <div class="settings-grid">
+                    <!-- Upload Bereich für CSV-Datei -->
+                    <div class="upload-area" id="uploadArea">
+                        <p class="upload-instructions">Ziehen Sie eine CSV-Datei hierher oder klicken Sie zum Hochladen</p>
+                        <button class="upload-button" onclick="document.getElementById('fileInput').click()">CSV-Datei auswählen</button>
+                        <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)">
+                        <p class="file-info" id="fileInfo">Keine Datei ausgewählt</p>
+                    </div>
+                    
+                    <!-- Fehlend melden Bereich -->
+                    <div class="missing-section">
+                        <h3>Mitarbeiter fehlend melden</h3>
+                        <input type="text" id="missingEmployeeInput" placeholder="Mitarbeiter suchen..." class="autocomplete-input" />
+                        <div id="missingEmployeeSuggestions" class="autocomplete-suggestions"></div>
+                        <div id="missingEmployeesList" class="missing-list"></div>
+                    </div>
                 </div>
             </div>
         </div>
