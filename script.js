@@ -105,7 +105,9 @@ function updateTableVisibility() {
 
 // Funktion zum Aktualisieren der effektiven Verschiebungen
 function updateEffectiveMoves() {
-    if (!currentData || !originalAssignments) return;
+    if (!currentData || !originalAssignments || !sortedClasses || sortedClasses.length === 0) {
+        return;
+    }
     
     // Aktuelle Zuordnungen aus der Tabelle lesen
     const currentAssignments = {};
@@ -144,6 +146,8 @@ function updateEffectiveMoves() {
 // Funktion zum Aktualisieren der Verschiebungen-Liste
 function updateMovesList() {
     const movesList = document.getElementById('movesList');
+    if (!movesList) return;
+    
     movesList.innerHTML = '';
     
     // Sortiere nach Zeit und dann nach Mitarbeiter
@@ -159,8 +163,12 @@ function updateMovesList() {
         div.className = 'move-entry';
         
         // Farbindex für die Zielklasse bestimmen
-        const classIndex = sortedClasses.indexOf(move.toClass) % 25;
-        const color = getColorForIndex(classIndex);
+        let classIndex = 0;
+        if (sortedClasses && sortedClasses.length > 0) {
+            classIndex = sortedClasses.indexOf(move.toClass);
+            if (classIndex === -1) classIndex = 0;
+        }
+        const color = getColorForIndex(classIndex % 25);
         
         div.innerHTML = `
             <div class="move-color" style="background-color: ${color}"></div>
@@ -274,9 +282,9 @@ function parseCSV(content) {
     generateTable();
     setupDragAndDrop();
     
-    // Setze effektive Verschiebungen zurück
+    // Setze effektive Verschiebungen zurück und aktualisiere
     effectiveMoves = [];
-    updateMovesList();
+    setTimeout(updateEffectiveMoves, 100);
 }
 
 // Funktion zum Generieren der Tabelle
