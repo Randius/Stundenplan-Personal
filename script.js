@@ -144,7 +144,8 @@ function generateTable() {
     // Header-Zellen für Klassen in einer einzigen Zeile
     let headerRow = '<tr>';
     for (const className of sortedClasses) {
-        headerRow += `<th class="header-cell">${className}</th>`;
+        const classColor = getClassColor(className);
+        headerRow += `<th class="header-cell ${classColor}">${className}</th>`;
     }
     headerRow += '</tr>';
     header.innerHTML = headerRow;

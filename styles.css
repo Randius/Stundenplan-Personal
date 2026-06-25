@@ -106,11 +106,19 @@ th {
     font-weight: bold;
 }
 
-.header-cell {
-    background-color: #2E7D32;
-    color: white;
-    font-weight: bold;
-}
+/* Header-Zellen mit Klassenfarben */
+.header-cell.class-1a { background-color: #FF5722; color: white; font-weight: bold; }
+.header-cell.class-1b { background-color: #2196F3; color: white; font-weight: bold; }
+.header-cell.class-1c { background-color: #9C27B0; color: white; font-weight: bold; }
+.header-cell.class-1d { background-color: #4CAF50; color: white; font-weight: bold; }
+.header-cell.class-2a { background-color: #FF9800; color: white; font-weight: bold; }
+.header-cell.class-2b { background-color: #00BCD4; color: white; font-weight: bold; }
+.header-cell.class-2c { background-color: #673AB7; color: white; font-weight: bold; }
+.header-cell.class-2d { background-color: #8BC34A; color: white; font-weight: bold; }
+.header-cell.class-3a { background-color: #F44336; color: white; font-weight: bold; }
+.header-cell.class-3b { background-color: #03A9F4; color: white; font-weight: bold; }
+.header-cell.class-3c { background-color: #7B1FA2; color: white; font-weight: bold; }
+.header-cell.class-3d { background-color: #CDDC39; color: black; font-weight: bold; }
 
 .morning-cell {
     background-color: #E8F5E9;
