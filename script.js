@@ -212,6 +212,10 @@ function handleFileUpload(event) {
 
 // Funktion zum Parsen der CSV-Datei
 function parseCSV(content) {
+    // Setze globale Variablen zurück
+    originalAssignments = {};
+    effectiveMoves = [];
+    
     // Entferne BOM (Byte Order Mark) falls vorhanden
     if (content.charCodeAt(0) === 0xFEFF) {
         content = content.slice(1);
@@ -282,8 +286,7 @@ function parseCSV(content) {
     generateTable();
     setupDragAndDrop();
     
-    // Setze effektive Verschiebungen zurück und aktualisiere
-    effectiveMoves = [];
+    // Aktualisiere die Verschiebungen-Liste (wird in generateTable aufgerufen)
     setTimeout(updateEffectiveMoves, 100);
 }
 
