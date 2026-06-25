@@ -47,26 +47,6 @@ h1 {
     background-color: #2E7D32;
 }
 
-.settings-content {
-    max-width: 600px;
-    margin-top: 10px;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    display: block;
-}
-
-.settings-content.hidden {
-    display: none;
-}
-
-/* Upload-Bereich in der Breite begrenzen */
-.upload-area {
-    max-width: 500px;
-    margin: 0 auto;
-}
-
 /* Settings Grid für nebeneinander liegende Elemente */
 .settings-grid {
     display: grid;
@@ -80,11 +60,25 @@ h1 {
     max-width: 1400px;
     margin: 0 auto;
     padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+.settings-content.hidden {
+    display: none;
+}
+
+/* Upload-Bereich in der Breite begrenzen */
+.upload-area {
+    width: 100%;
+    margin: 0 auto;
 }
 
 /* Fehlend melden Bereich */
 .missing-section {
-    max-width: 500px;
+    width: 100%;
     margin: 0 auto;
 }
 
@@ -171,7 +165,7 @@ h1 {
 
 /* Verschiebungen Bereich */
 .moves-section {
-    max-width: 500px;
+    width: 100%;
     margin: 0 auto;
 }
 
