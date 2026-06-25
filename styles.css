@@ -22,9 +22,7 @@ h1 {
 /* Einstellungen-Sektion */
 .settings-section {
     margin-bottom: 20px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
 }
 
 .settings-toggle {
@@ -213,7 +211,7 @@ h1 {
 }
 
 .container {
-    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
     background-color: white;
     padding: 20px;
