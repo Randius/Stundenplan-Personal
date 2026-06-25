@@ -127,14 +127,14 @@ function updateEffectiveMoves() {
     for (const employee in currentAssignments) {
         for (const timeSlot in currentAssignments[employee]) {
             const currentClass = currentAssignments[employee][timeSlot];
-            const originalClass = originalAssignments[employee]?.[timeSlot];
+            const originalAssignment = originalAssignments[employee]?.[timeSlot];
             
-            if (originalClass && currentClass !== originalClass) {
+            if (originalAssignment && currentClass !== originalAssignment.className) {
                 effectiveMoves.push({
                     employee: employee,
-                    fromClass: originalClass,
+                    fromClass: originalAssignment.className,
                     toClass: currentClass,
-                    timeSlot: timeSlot
+                    timeSlot: originalAssignment.originalTimeSlot // Verwende den ursprünglichen Zeitslot
                 });
             }
         }
@@ -173,7 +173,7 @@ function updateMovesList() {
         div.innerHTML = `
             <div class="move-color" style="background-color: ${color}"></div>
             <div class="move-info">
-                <span class="move-time">${move.timeSlot === 'Vormittag' ? 'Vorm.' : 'Nachm.'}</span>
+                <span class="move-time">${move.timeSlot === 'Vormittag' ? 'Vorm.' : move.timeSlot === 'Nachmittag' ? 'Nachm.' : move.timeSlot}</span>
                 <span>${move.employee}: ${move.fromClass} → ${move.toClass}</span>
             </div>
         `;
@@ -267,11 +267,14 @@ function parseCSV(content) {
             
             classAssignments[timeSlot][className].push(employeeName);
             
-            // Speichere die ursprüngliche Zuordnung (normalisiere den timeSlot zu lowercase)
+            // Speichere die ursprüngliche Zuordnung (normalisiere den timeSlot zu lowercase, aber speichere auch den ursprünglichen)
             if (!originalAssignments[employeeName]) {
                 originalAssignments[employeeName] = {};
             }
-            originalAssignments[employeeName][timeSlot.toLowerCase()] = className;
+            originalAssignments[employeeName][timeSlot.toLowerCase()] = {
+                className: className,
+                originalTimeSlot: timeSlot // Speichere den ursprünglichen Zeitslot (z.B. "Vormittag")
+            };
         }
     }
 
