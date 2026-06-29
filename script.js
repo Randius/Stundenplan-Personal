@@ -88,18 +88,6 @@ function updateMissingEmployeesList() {
     });
 }
 
-// Funktion zum Erstellen eines fehlenden Mitarbeiter-Elements
-function createMissingEmployeeElement(employeeName, className) {
-    const colorIndex = classColorMap[className] || 0;
-    const item = document.createElement('li');
-    item.className = `employee-item color-${colorIndex} missing`;
-    item.dataset.employee = employeeName;
-    item.dataset.originalClass = className;
-    item.draggable = true;
-    item.textContent = employeeName;
-    return item;
-}
-
 // Funktion zum Aktualisieren der Fehlend-Markierungen in der Tabelle
 function updateMissingMarkings() {
     if (!currentData) return;
@@ -117,52 +105,38 @@ function updateMissingMarkings() {
         
         const className = cell.dataset.class;
         const timeSlot = cell.dataset.time;
+        const colorIndex = classColorMap[className];
         
-        // Finde alle Mitarbeiter, die in dieser Zelle sein sollten
-        const expectedEmployees = currentData.assignments[timeSlot]?.[className] || [];
+        // Finde alle Mitarbeiter in dieser Zelle
+        const items = Array.from(list.querySelectorAll('.employee-item'));
         
         // Trenne fehlende und nicht-fehlende Mitarbeiter
         const presentItems = [];
-        const missingInThisCell = [];
+        const missingItems = [];
         
-        // Gehe durch alle erwarteten Mitarbeiter
-        expectedEmployees.forEach(employee => {
-            if (missingEmployees.has(employee)) {
-                missingInThisCell.push(employee);
+        items.forEach(item => {
+            const employeeName = item.dataset.employee;
+            if (missingEmployees.has(employeeName)) {
+                item.classList.add('missing');
+                missingItems.push(item);
             } else {
-                presentItems.push(employee);
+                item.classList.remove('missing');
+                presentItems.push(item);
             }
         });
         
-        // Neu ordnen: erst normale Mitarbeiter
+        // Neu ordnen: erst normale Mitarbeiter in der Liste
         list.innerHTML = '';
-        presentItems.forEach(employee => {
-            const colorIndex = classColorMap[className];
-            const item = document.createElement('li');
-            item.className = `employee-item color-${colorIndex}`;
-            item.dataset.employee = employee;
-            item.dataset.originalClass = className;
-            item.draggable = true;
-            item.textContent = employee;
-            list.appendChild(item);
-        });
+        presentItems.forEach(item => list.appendChild(item));
         
         // Fehlende Mitarbeiter in separaten Container unter der Liste
-        if (missingInThisCell.length > 0) {
+        if (missingItems.length > 0) {
             const missingContainer = document.createElement('div');
             missingContainer.className = 'missing-container';
-            missingInThisCell.forEach(employee => {
-                const item = createMissingEmployeeElement(employee, className);
-                missingContainer.appendChild(item);
-            });
+            missingItems.forEach(item => missingContainer.appendChild(item));
             cell.appendChild(missingContainer);
         }
     });
-    
-    // Drag & Drop für neue Elemente einrichten
-    setupDragAndDrop();
-    // Verschiebungen aktualisieren
-    setTimeout(updateEffectiveMoves, 100);
 }
 
 // Funktion zum Aktualisieren der effektiven Verschiebungen
