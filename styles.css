@@ -86,17 +86,6 @@ h1 {
     font-size: 16px;
 }
 
-/* Krankmeldungen Bereich */
-.sick-section {
-    width: 100%;
-}
-
-.sick-section h3 {
-    color: #333;
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
 /* Autocomplete Input */
 .autocomplete-input {
     width: 100%;
@@ -154,8 +143,8 @@ h1 {
     justify-content: space-between;
     align-items: center;
     padding: 6px 10px;
-    background-color: #fff;
-    border: 1px solid #eee;
+    background-color: #ffebee;
+    border: 1px solid #ef9a9a;
     border-radius: 4px;
     margin-bottom: 5px;
     font-size: 14px;
@@ -169,40 +158,6 @@ h1 {
 }
 
 .missing-employee .remove-missing:hover {
-    color: #d32f2f;
-}
-
-/* Liste der kranken Mitarbeiter */
-.sick-list {
-    margin-top: 10px;
-    max-height: 150px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
-    padding: 5px;
-}
-
-.sick-employee {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 10px;
-    background-color: #ffebee;
-    border: 1px solid #ef9a9a;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    font-size: 14px;
-}
-
-.sick-employee .remove-sick {
-    cursor: pointer;
-    color: #f44336;
-    font-weight: bold;
-    margin-left: 10px;
-}
-
-.sick-employee .remove-sick:hover {
     color: #d32f2f;
 }
 
@@ -434,14 +389,14 @@ th {
     opacity: 0.5;
 }
 
-/* Krankmeldung - gut sichtbares Feld */
-.employee-item.sick {
+/* Fehlend-Meldung - gut sichtbares Feld (wie Krankmeldung) */
+.employee-item.missing {
     background-color: #ffebee !important;
     border-left: 8px solid #f44336 !important;
     position: relative;
 }
 
-.employee-item.sick::before {
+.employee-item.missing::before {
     content: "🤒";
     position: absolute;
     right: 8px;
@@ -450,31 +405,34 @@ th {
     font-size: 16px;
 }
 
-.employee-item.sick.color-0 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-1 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-2 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-3 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-4 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-5 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-6 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-7 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-8 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-9 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-10 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-11 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-12 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-13 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-14 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-15 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-16 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-17 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-18 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-19 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-20 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-21 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-22 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-23 { border-left: 8px solid #f44336 !important; }
-.employee-item.sick.color-24 { border-left: 8px solid #f44336 !important; }
+/* Überschreibe alle Farbklassen für fehlende Mitarbeiter */
+.employee-item.missing.color-0,
+.employee-item.missing.color-1,
+.employee-item.missing.color-2,
+.employee-item.missing.color-3,
+.employee-item.missing.color-4,
+.employee-item.missing.color-5,
+.employee-item.missing.color-6,
+.employee-item.missing.color-7,
+.employee-item.missing.color-8,
+.employee-item.missing.color-9,
+.employee-item.missing.color-10,
+.employee-item.missing.color-11,
+.employee-item.missing.color-12,
+.employee-item.missing.color-13,
+.employee-item.missing.color-14,
+.employee-item.missing.color-15,
+.employee-item.missing.color-16,
+.employee-item.missing.color-17,
+.employee-item.missing.color-18,
+.employee-item.missing.color-19,
+.employee-item.missing.color-20,
+.employee-item.missing.color-21,
+.employee-item.missing.color-22,
+.employee-item.missing.color-23,
+.employee-item.missing.color-24 {
+    border-left: 8px solid #f44336 !important;
+}
 
 /* Klassenfarben */
 .class-1a { border-left: 4px solid #FF5722; }

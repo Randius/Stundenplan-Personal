@@ -3,7 +3,6 @@ let currentData = null;
 let draggedItem = null;
 let originalCell = null;
 let missingEmployees = new Set();
-let sickEmployees = new Set(); // Neue Variable für Krankmeldungen
 let originalAssignments = {}; // Ursprüngliche Klassenzuordnungen: { employee: { timeSlot: className } }
 let effectiveMoves = []; // Liste der effektiven Verschiebungen: { employee, fromClass, toClass, timeSlot }
 let sortedClasses = []; // Global verfügbare Liste der sortierten Klassen
@@ -33,19 +32,9 @@ function filterEmployees(input) {
     );
 }
 
-// Neue Funktion zum Filtern der Mitarbeiter für Krankmeldungen Autocomplete
-function filterEmployeesForSick(input) {
-    if (!currentData || !currentData.employees) return [];
-    
-    const query = input.toLowerCase();
-    return currentData.employees.filter(employee => 
-        employee.toLowerCase().includes(query) && !missingEmployees.has(employee)
-    );
-}
-
 // Funktion zum Anzeigen der Autocomplete-Vorschläge
-function showSuggestions(suggestions, inputId, suggestionsId) {
-    const suggestionsContainer = document.getElementById(suggestionsId);
+function showSuggestions(suggestions) {
+    const suggestionsContainer = document.getElementById('missingEmployeeSuggestions');
     suggestionsContainer.innerHTML = '';
     
     if (suggestions.length === 0) {
@@ -57,13 +46,9 @@ function showSuggestions(suggestions, inputId, suggestionsId) {
         const div = document.createElement('div');
         div.textContent = employee;
         div.onclick = () => {
-            if (inputId === 'missingEmployeeInput') {
-                addMissingEmployee(employee);
-            } else if (inputId === 'sickEmployeeInput') {
-                addSickEmployee(employee);
-            }
+            addMissingEmployee(employee);
             suggestionsContainer.classList.remove('show');
-            document.getElementById(inputId).value = '';
+            document.getElementById('missingEmployeeInput').value = '';
         };
         suggestionsContainer.appendChild(div);
     });
@@ -75,12 +60,8 @@ function showSuggestions(suggestions, inputId, suggestionsId) {
 function addMissingEmployee(employeeName) {
     if (!missingEmployees.has(employeeName)) {
         missingEmployees.add(employeeName);
-        // Entferne aus Krankmeldungen falls vorhanden
-        sickEmployees.delete(employeeName);
         updateMissingEmployeesList();
-        updateSickEmployeesList();
-        updateTableVisibility();
-        updateSickMarkings();
+        updateMissingMarkings();
     }
 }
 
@@ -88,7 +69,7 @@ function addMissingEmployee(employeeName) {
 function removeMissingEmployee(employeeName) {
     missingEmployees.delete(employeeName);
     updateMissingEmployeesList();
-    updateTableVisibility();
+    updateMissingMarkings();
 }
 
 // Funktion zum Aktualisieren der Liste der fehlenden Mitarbeiter
@@ -107,71 +88,20 @@ function updateMissingEmployeesList() {
     });
 }
 
-// Funktion zum Aktualisieren der Tabellensichtbarkeit
-function updateTableVisibility() {
-    if (!currentData) return;
-    
-    // Alle Mitarbeiter-Labels durchgehen und fehlende ausblenden
-    document.querySelectorAll('.employee-item').forEach(item => {
-        const employeeName = item.dataset.employee;
-        if (missingEmployees.has(employeeName)) {
-            item.style.display = 'none';
-        } else {
-            item.style.display = 'list-item';
-        }
-    });
-}
-
-// ========== KRANKMELDUNGEN FUNKTIONEN ==========
-
-// Funktion zum Hinzufügen eines kranken Mitarbeiters
-function addSickEmployee(employeeName) {
-    if (!sickEmployees.has(employeeName) && !missingEmployees.has(employeeName)) {
-        sickEmployees.add(employeeName);
-        updateSickEmployeesList();
-        updateSickMarkings();
-    }
-}
-
-// Funktion zum Entfernen eines kranken Mitarbeiters
-function removeSickEmployee(employeeName) {
-    sickEmployees.delete(employeeName);
-    updateSickEmployeesList();
-    updateSickMarkings();
-}
-
-// Funktion zum Aktualisieren der Liste der kranken Mitarbeiter
-function updateSickEmployeesList() {
-    const sickList = document.getElementById('sickEmployeesList');
-    sickList.innerHTML = '';
-    
-    sickEmployees.forEach(employee => {
-        const div = document.createElement('div');
-        div.className = 'sick-employee';
-        div.innerHTML = `
-            ${employee}
-            <span class="remove-sick" onclick="removeSickEmployee('${employee}')">\u00d7</span>
-        `;
-        sickList.appendChild(div);
-    });
-}
-
-// Funktion zum Aktualisieren der Krankmeldungs-Markierungen in der Tabelle
-function updateSickMarkings() {
+// Funktion zum Aktualisieren der Fehlend-Markierungen in der Tabelle
+function updateMissingMarkings() {
     if (!currentData) return;
     
     // Alle Mitarbeiter-Labels durchgehen
     document.querySelectorAll('.employee-item').forEach(item => {
         const employeeName = item.dataset.employee;
-        if (sickEmployees.has(employeeName)) {
-            item.classList.add('sick');
+        if (missingEmployees.has(employeeName)) {
+            item.classList.add('missing');
         } else {
-            item.classList.remove('sick');
+            item.classList.remove('missing');
         }
     });
 }
-
-// ========== VERSCHIEBUNGEN FUNKTIONEN ==========
 
 // Funktion zum Aktualisieren der effektiven Verschiebungen
 function updateEffectiveMoves() {
@@ -284,7 +214,6 @@ function parseCSV(content) {
     originalAssignments = {};
     effectiveMoves = [];
     missingEmployees.clear();
-    sickEmployees.clear();
     
     // Entferne BOM (Byte Order Mark) falls vorhanden
     if (content.charCodeAt(0) === 0xFEFF) {
@@ -361,7 +290,6 @@ function parseCSV(content) {
     
     // Aktualisiere die Listen
     updateMissingEmployeesList();
-    updateSickEmployeesList();
     
     // Aktualisiere die Verschiebungen-Liste (wird in generateTable aufgerufen)
     setTimeout(updateEffectiveMoves, 100);
@@ -439,8 +367,8 @@ function generateTable() {
         body.innerHTML += row;
     }
     
-    // Nach dem Generieren der Tabelle die Krankmeldungen markieren
-    updateSickMarkings();
+    // Nach dem Generieren der Tabelle die Fehlend-Markierungen aktualisieren
+    updateMissingMarkings();
 }
 
 // Funktion zum Bestimmen der Farbklasse basierend auf dem Index
@@ -469,8 +397,8 @@ function setupDragAndDrop() {
             originalCell = null;
             // Entferne drop-target Klasse von allen Zellen
             cells.forEach(cell => cell.classList.remove('drop-target'));
-            // Aktualisiere die Krankmeldungs-Markierungen nach dem Drag
-            setTimeout(updateSickMarkings, 50);
+            // Aktualisiere die Fehlend-Markierungen nach dem Drag
+            setTimeout(updateMissingMarkings, 50);
         });
     });
 
@@ -510,8 +438,8 @@ function setupDragAndDrop() {
                 
                 // Aktualisiere die Liste der effektiven Verschiebungen
                 setTimeout(updateEffectiveMoves, 100);
-                // Aktualisiere die Krankmeldungs-Markierungen
-                setTimeout(updateSickMarkings, 100);
+                // Aktualisiere die Fehlend-Markierungen
+                setTimeout(updateMissingMarkings, 100);
             }
         });
     });
@@ -532,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(autocompleteTimeout);
         autocompleteTimeout = setTimeout(() => {
             const suggestions = filterEmployees(this.value);
-            showSuggestions(suggestions, 'missingEmployeeInput', 'missingEmployeeSuggestions');
+            showSuggestions(suggestions);
         }, 200);
     });
     
@@ -549,35 +477,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 addMissingEmployee(suggestions[0]);
                 this.value = '';
                 document.getElementById('missingEmployeeSuggestions').classList.remove('show');
-            }
-        }
-    });
-
-    // Autocomplete für kranke Mitarbeiter
-    const sickEmployeeInput = document.getElementById('sickEmployeeInput');
-    let sickAutocompleteTimeout;
-    
-    sickEmployeeInput.addEventListener('input', function() {
-        clearTimeout(sickAutocompleteTimeout);
-        sickAutocompleteTimeout = setTimeout(() => {
-            const suggestions = filterEmployeesForSick(this.value);
-            showSuggestions(suggestions, 'sickEmployeeInput', 'sickEmployeeSuggestions');
-        }, 200);
-    });
-    
-    sickEmployeeInput.addEventListener('blur', function() {
-        setTimeout(() => {
-            document.getElementById('sickEmployeeSuggestions').classList.remove('show');
-        }, 200);
-    });
-    
-    sickEmployeeInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const suggestions = filterEmployeesForSick(this.value);
-            if (suggestions.length > 0) {
-                addSickEmployee(suggestions[0]);
-                this.value = '';
-                document.getElementById('sickEmployeeSuggestions').classList.remove('show');
             }
         }
     });
