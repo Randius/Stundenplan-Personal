@@ -133,6 +133,22 @@ function updateMissingMarkings() {
             cell.appendChild(missingContainer);
         }
     });
+    
+    // Zellenhöhe anpassen, damit Platz für fehlende Mitarbeiter ist
+    adjustCellHeights();
+}
+
+// Funktion zum Anpassen der Zellenhöhe für fehlende Mitarbeiter
+function adjustCellHeights() {
+    document.querySelectorAll('td[data-class][data-time]').forEach(cell => {
+        const hasMissing = cell.querySelector('.missing-container') !== null;
+        if (hasMissing) {
+            // Mindesthöhe setzen, damit Platz für fehlende Mitarbeiter ist
+            cell.style.minHeight = '100px';
+        } else {
+            cell.style.minHeight = '';
+        }
+    });
 }
 
 // Funktion zum Aktualisieren der effektiven Verschiebungen
