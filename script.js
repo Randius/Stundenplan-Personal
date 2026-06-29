@@ -88,6 +88,18 @@ function updateMissingEmployeesList() {
     });
 }
 
+// Funktion zum Erstellen eines fehlenden Mitarbeiter-Elements
+function createMissingItem(employeeName, className) {
+    const colorIndex = classColorMap[className] || 0;
+    const item = document.createElement('li');
+    item.className = `employee-item color-${colorIndex} missing`;
+    item.dataset.employee = employeeName;
+    item.dataset.originalClass = className;
+    item.textContent = employeeName;
+    // Kein draggable für fehlende Mitarbeiter
+    return item;
+}
+
 // Funktion zum Aktualisieren der Fehlend-Markierungen in der Tabelle
 function updateMissingMarkings() {
     if (!currentData) return;
@@ -105,35 +117,32 @@ function updateMissingMarkings() {
         
         const className = cell.dataset.class;
         const timeSlot = cell.dataset.time;
-        const colorIndex = classColorMap[className];
         
-        // Finde alle Mitarbeiter in dieser Zelle
+        // Alle Mitarbeiter in dieser Zelle durchgehen
         const items = Array.from(list.querySelectorAll('.employee-item'));
         
-        // Trenne fehlende und nicht-fehlende Mitarbeiter
-        const presentItems = [];
-        const missingItems = [];
-        
+        // Verstecke fehlende, zeige normale
         items.forEach(item => {
             const employeeName = item.dataset.employee;
             if (missingEmployees.has(employeeName)) {
-                item.classList.add('missing');
-                missingItems.push(item);
+                item.style.display = 'none';
             } else {
-                item.classList.remove('missing');
-                presentItems.push(item);
+                item.style.display = 'list-item';
             }
         });
         
-        // Neu ordnen: erst normale Mitarbeiter in der Liste
-        list.innerHTML = '';
-        presentItems.forEach(item => list.appendChild(item));
+        // Fehlende Mitarbeiter in dieser Zelle finden und anzeigen
+        const expectedEmployees = currentData.assignments[timeSlot]?.[className] || [];
+        const missingInThisCell = expectedEmployees.filter(emp => missingEmployees.has(emp));
         
-        // Fehlende Mitarbeiter in separaten Container unter der Liste
-        if (missingItems.length > 0) {
+        // Fehlende Mitarbeiter in separaten Container
+        if (missingInThisCell.length > 0) {
             const missingContainer = document.createElement('div');
             missingContainer.className = 'missing-container';
-            missingItems.forEach(item => missingContainer.appendChild(item));
+            missingInThisCell.forEach(employee => {
+                const item = createMissingItem(employee, className);
+                missingContainer.appendChild(item);
+            });
             cell.appendChild(missingContainer);
         }
     });
@@ -145,9 +154,9 @@ function updateEffectiveMoves() {
         return;
     }
     
-    // Aktuelle Zuordnungen aus der Tabelle lesen (nur nicht-fehlende Mitarbeiter)
+    // Aktuelle Zuordnungen aus der Tabelle lesen (nur sichtbare Mitarbeiter in employee-list)
     const currentAssignments = {};
-    document.querySelectorAll('td[data-class][data-time] .employee-list .employee-item').forEach(item => {
+    document.querySelectorAll('td[data-class][data-time] .employee-list .employee-item:not([style*="display: none"])').forEach(item => {
         const employee = item.dataset.employee;
         const className = item.parentElement.parentElement.dataset.class;
         const timeSlot = item.parentElement.parentElement.dataset.time;
