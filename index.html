@@ -9,12 +9,12 @@
 <body>
     <div class="container">
         <h1>Personalverteilung</h1>
-        <p class="version">Version: 0.1.4</p>
+        <p class="version">Version: 0.1.5</p>
         
         <!-- Einstellungen (einklappbar) -->
         <div class="settings-section">
             <button class="settings-toggle" id="settingsToggle" onclick="toggleSettings()">
-                ⚙️ Einstellungen
+                F6E0 Einstellungen
             </button>
             <div class="settings-content" id="settingsContent">
                 <div class="settings-grid">
@@ -34,6 +34,15 @@
                         <div id="missingEmployeesList" class="missing-list"></div>
                     </div>
                     
+                    <!-- Krankmeldungen Bereich -->
+                    <div class="sick-section">
+                        <h3>Krankmeldungen</h3>
+                        <input type="text" id="sickEmployeeInput" placeholder="Mitarbeiter suchen..." class="autocomplete-input" />
+                        <div id="sickEmployeeSuggestions" class="autocomplete-suggestions"></div>
+                        <div id="sickEmployeesList" class="sick-list"></div>
+                    </div>
+                </div>
+                <div class="settings-grid">
                     <!-- Verschiebungen Bereich -->
                     <div class="moves-section">
                         <h3>Verschiebungen</h3>

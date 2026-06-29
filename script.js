@@ -3,6 +3,7 @@ let currentData = null;
 let draggedItem = null;
 let originalCell = null;
 let missingEmployees = new Set();
+let sickEmployees = new Set(); // Neue Variable für Krankmeldungen
 let originalAssignments = {}; // Ursprüngliche Klassenzuordnungen: { employee: { timeSlot: className } }
 let effectiveMoves = []; // Liste der effektiven Verschiebungen: { employee, fromClass, toClass, timeSlot }
 let sortedClasses = []; // Global verfügbare Liste der sortierten Klassen
@@ -15,10 +16,10 @@ function toggleSettings() {
     
     if (settingsContent.classList.contains('hidden')) {
         settingsContent.classList.remove('hidden');
-        settingsToggle.textContent = '⚙️ Einstellungen ausblenden';
+        settingsToggle.textContent = '\u2699\ufe0f Einstellungen ausblenden';
     } else {
         settingsContent.classList.add('hidden');
-        settingsToggle.textContent = '⚙️ Einstellungen einblenden';
+        settingsToggle.textContent = '\u2699\ufe0f Einstellungen einblenden';
     }
 }
 
@@ -32,9 +33,19 @@ function filterEmployees(input) {
     );
 }
 
+// Neue Funktion zum Filtern der Mitarbeiter für Krankmeldungen Autocomplete
+function filterEmployeesForSick(input) {
+    if (!currentData || !currentData.employees) return [];
+    
+    const query = input.toLowerCase();
+    return currentData.employees.filter(employee => 
+        employee.toLowerCase().includes(query) && !missingEmployees.has(employee)
+    );
+}
+
 // Funktion zum Anzeigen der Autocomplete-Vorschläge
-function showSuggestions(suggestions) {
-    const suggestionsContainer = document.getElementById('missingEmployeeSuggestions');
+function showSuggestions(suggestions, inputId, suggestionsId) {
+    const suggestionsContainer = document.getElementById(suggestionsId);
     suggestionsContainer.innerHTML = '';
     
     if (suggestions.length === 0) {
@@ -46,9 +57,13 @@ function showSuggestions(suggestions) {
         const div = document.createElement('div');
         div.textContent = employee;
         div.onclick = () => {
-            addMissingEmployee(employee);
+            if (inputId === 'missingEmployeeInput') {
+                addMissingEmployee(employee);
+            } else if (inputId === 'sickEmployeeInput') {
+                addSickEmployee(employee);
+            }
             suggestionsContainer.classList.remove('show');
-            document.getElementById('missingEmployeeInput').value = '';
+            document.getElementById(inputId).value = '';
         };
         suggestionsContainer.appendChild(div);
     });
@@ -60,8 +75,12 @@ function showSuggestions(suggestions) {
 function addMissingEmployee(employeeName) {
     if (!missingEmployees.has(employeeName)) {
         missingEmployees.add(employeeName);
+        // Entferne aus Krankmeldungen falls vorhanden
+        sickEmployees.delete(employeeName);
         updateMissingEmployeesList();
+        updateSickEmployeesList();
         updateTableVisibility();
+        updateSickMarkings();
     }
 }
 
@@ -82,7 +101,7 @@ function updateMissingEmployeesList() {
         div.className = 'missing-employee';
         div.innerHTML = `
             ${employee}
-            <span class="remove-missing" onclick="removeMissingEmployee('${employee}')">×</span>
+            <span class="remove-missing" onclick="removeMissingEmployee('${employee}')">\u00d7</span>
         `;
         missingList.appendChild(div);
     });
@@ -102,6 +121,57 @@ function updateTableVisibility() {
         }
     });
 }
+
+// ========== KRANKMELDUNGEN FUNKTIONEN ==========
+
+// Funktion zum Hinzufügen eines kranken Mitarbeiters
+function addSickEmployee(employeeName) {
+    if (!sickEmployees.has(employeeName) && !missingEmployees.has(employeeName)) {
+        sickEmployees.add(employeeName);
+        updateSickEmployeesList();
+        updateSickMarkings();
+    }
+}
+
+// Funktion zum Entfernen eines kranken Mitarbeiters
+function removeSickEmployee(employeeName) {
+    sickEmployees.delete(employeeName);
+    updateSickEmployeesList();
+    updateSickMarkings();
+}
+
+// Funktion zum Aktualisieren der Liste der kranken Mitarbeiter
+function updateSickEmployeesList() {
+    const sickList = document.getElementById('sickEmployeesList');
+    sickList.innerHTML = '';
+    
+    sickEmployees.forEach(employee => {
+        const div = document.createElement('div');
+        div.className = 'sick-employee';
+        div.innerHTML = `
+            ${employee}
+            <span class="remove-sick" onclick="removeSickEmployee('${employee}')">\u00d7</span>
+        `;
+        sickList.appendChild(div);
+    });
+}
+
+// Funktion zum Aktualisieren der Krankmeldungs-Markierungen in der Tabelle
+function updateSickMarkings() {
+    if (!currentData) return;
+    
+    // Alle Mitarbeiter-Labels durchgehen
+    document.querySelectorAll('.employee-item').forEach(item => {
+        const employeeName = item.dataset.employee;
+        if (sickEmployees.has(employeeName)) {
+            item.classList.add('sick');
+        } else {
+            item.classList.remove('sick');
+        }
+    });
+}
+
+// ========== VERSCHIEBUNGEN FUNKTIONEN ==========
 
 // Funktion zum Aktualisieren der effektiven Verschiebungen
 function updateEffectiveMoves() {
@@ -174,7 +244,7 @@ function updateMovesList() {
             <div class="move-color" style="background-color: ${color}"></div>
             <div class="move-info">
                 <span class="move-time">${move.timeSlot === 'Vormittag' ? 'Vorm.' : move.timeSlot === 'Nachmittag' ? 'Nachm.' : move.timeSlot}</span>
-                <span>${move.employee}: ${move.fromClass} → ${move.toClass}</span>
+                <span>${move.employee}: ${move.fromClass} \u2192 ${move.toClass}</span>
             </div>
         `;
         movesList.appendChild(div);
@@ -192,8 +262,6 @@ function getColorForIndex(index) {
     ];
     return colors[index % colors.length];
 }
-
-
 
 // Funktion zum Verarbeiten der hochgeladenen Datei
 function handleFileUpload(event) {
@@ -215,6 +283,8 @@ function parseCSV(content) {
     // Setze globale Variablen zurück
     originalAssignments = {};
     effectiveMoves = [];
+    missingEmployees.clear();
+    sickEmployees.clear();
     
     // Entferne BOM (Byte Order Mark) falls vorhanden
     if (content.charCodeAt(0) === 0xFEFF) {
@@ -288,6 +358,10 @@ function parseCSV(content) {
     fileInfo.textContent = `Geladene Datei: ${employees.length} Mitarbeiter, ${timeSlots.length} Zeitslots`;
     generateTable();
     setupDragAndDrop();
+    
+    // Aktualisiere die Listen
+    updateMissingEmployeesList();
+    updateSickEmployeesList();
     
     // Aktualisiere die Verschiebungen-Liste (wird in generateTable aufgerufen)
     setTimeout(updateEffectiveMoves, 100);
@@ -364,6 +438,9 @@ function generateTable() {
         row += '</tr>';
         body.innerHTML += row;
     }
+    
+    // Nach dem Generieren der Tabelle die Krankmeldungen markieren
+    updateSickMarkings();
 }
 
 // Funktion zum Bestimmen der Farbklasse basierend auf dem Index
@@ -392,6 +469,8 @@ function setupDragAndDrop() {
             originalCell = null;
             // Entferne drop-target Klasse von allen Zellen
             cells.forEach(cell => cell.classList.remove('drop-target'));
+            // Aktualisiere die Krankmeldungs-Markierungen nach dem Drag
+            setTimeout(updateSickMarkings, 50);
         });
     });
 
@@ -431,6 +510,8 @@ function setupDragAndDrop() {
                 
                 // Aktualisiere die Liste der effektiven Verschiebungen
                 setTimeout(updateEffectiveMoves, 100);
+                // Aktualisiere die Krankmeldungs-Markierungen
+                setTimeout(updateSickMarkings, 100);
             }
         });
     });
@@ -451,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(autocompleteTimeout);
         autocompleteTimeout = setTimeout(() => {
             const suggestions = filterEmployees(this.value);
-            showSuggestions(suggestions);
+            showSuggestions(suggestions, 'missingEmployeeInput', 'missingEmployeeSuggestions');
         }, 200);
     });
     
@@ -468,6 +549,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 addMissingEmployee(suggestions[0]);
                 this.value = '';
                 document.getElementById('missingEmployeeSuggestions').classList.remove('show');
+            }
+        }
+    });
+
+    // Autocomplete für kranke Mitarbeiter
+    const sickEmployeeInput = document.getElementById('sickEmployeeInput');
+    let sickAutocompleteTimeout;
+    
+    sickEmployeeInput.addEventListener('input', function() {
+        clearTimeout(sickAutocompleteTimeout);
+        sickAutocompleteTimeout = setTimeout(() => {
+            const suggestions = filterEmployeesForSick(this.value);
+            showSuggestions(suggestions, 'sickEmployeeInput', 'sickEmployeeSuggestions');
+        }, 200);
+    });
+    
+    sickEmployeeInput.addEventListener('blur', function() {
+        setTimeout(() => {
+            document.getElementById('sickEmployeeSuggestions').classList.remove('show');
+        }, 200);
+    });
+    
+    sickEmployeeInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const suggestions = filterEmployeesForSick(this.value);
+            if (suggestions.length > 0) {
+                addSickEmployee(suggestions[0]);
+                this.value = '';
+                document.getElementById('sickEmployeeSuggestions').classList.remove('show');
             }
         }
     });
