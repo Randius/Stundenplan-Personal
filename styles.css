@@ -389,11 +389,14 @@ th {
     opacity: 0.5;
 }
 
-/* Fehlend-Meldung - gut sichtbares Feld (wie Krankmeldung) */
+/* Fehlend-Meldung - deutlicher, dass er nicht dazugehört */
 .employee-item.missing {
-    background-color: #ffebee !important;
-    border-left: 8px solid #f44336 !important;
+    background-color: rgba(255, 235, 238, 0.5) !important;
+    border-left: 8px solid #d32f2f !important;
+    border: 1px dashed #d32f2f !important;
     position: relative;
+    margin-top: 8px !important;
+    opacity: 0.7;
 }
 
 .employee-item.missing::before {
@@ -431,7 +434,7 @@ th {
 .employee-item.missing.color-22,
 .employee-item.missing.color-23,
 .employee-item.missing.color-24 {
-    border-left: 8px solid #f44336 !important;
+    border-left: 8px solid #d32f2f !important;
 }
 
 /* Klassenfarben */

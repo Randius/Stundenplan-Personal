@@ -92,14 +92,31 @@ function updateMissingEmployeesList() {
 function updateMissingMarkings() {
     if (!currentData) return;
     
-    // Alle Mitarbeiter-Labels durchgehen
-    document.querySelectorAll('.employee-item').forEach(item => {
-        const employeeName = item.dataset.employee;
-        if (missingEmployees.has(employeeName)) {
-            item.classList.add('missing');
-        } else {
-            item.classList.remove('missing');
-        }
+    // Alle Zellen durchgehen
+    document.querySelectorAll('td[data-class][data-time] .employee-list').forEach(list => {
+        const items = Array.from(list.querySelectorAll('.employee-item'));
+        const cell = list.parentElement;
+        const colorIndex = classColorMap[cell.dataset.class];
+        
+        // Trenne fehlende und nicht-fehlende Mitarbeiter
+        const presentItems = [];
+        const missingItems = [];
+        
+        items.forEach(item => {
+            const employeeName = item.dataset.employee;
+            if (missingEmployees.has(employeeName)) {
+                item.classList.add('missing');
+                missingItems.push(item);
+            } else {
+                item.classList.remove('missing');
+                presentItems.push(item);
+            }
+        });
+        
+        // Neu ordnen: erst normale, dann fehlende
+        list.innerHTML = '';
+        presentItems.forEach(item => list.appendChild(item));
+        missingItems.forEach(item => list.appendChild(item));
     });
 }
 
@@ -434,12 +451,12 @@ function setupDragAndDrop() {
                 const newList = this.querySelector('.employee-list');
                 if (newList) {
                     newList.appendChild(draggedItem);
+                    // Nach dem Verschieben die Sortierung aktualisieren
+                    setTimeout(() => updateMissingMarkings(), 50);
                 }
                 
                 // Aktualisiere die Liste der effektiven Verschiebungen
                 setTimeout(updateEffectiveMoves, 100);
-                // Aktualisiere die Fehlend-Markierungen
-                setTimeout(updateMissingMarkings, 100);
             }
         });
     });
