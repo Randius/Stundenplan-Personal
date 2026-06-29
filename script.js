@@ -93,9 +93,11 @@ function updateMissingMarkings() {
     if (!currentData) return;
     
     // Alle Zellen durchgehen
-    document.querySelectorAll('td[data-class][data-time] .employee-list').forEach(list => {
+    document.querySelectorAll('td[data-class][data-time]').forEach(cell => {
+        const list = cell.querySelector('.employee-list');
+        if (!list) return;
+        
         const items = Array.from(list.querySelectorAll('.employee-item'));
-        const cell = list.parentElement;
         const colorIndex = classColorMap[cell.dataset.class];
         
         // Trenne fehlende und nicht-fehlende Mitarbeiter
@@ -128,7 +130,7 @@ function updateEffectiveMoves() {
     
     // Aktuelle Zuordnungen aus der Tabelle lesen
     const currentAssignments = {};
-    document.querySelectorAll('td[data-class][data-time] .employee-item').forEach(item => {
+    document.querySelectorAll('td[data-class][data-time] .employee-item:not(.missing)').forEach(item => {
         const employee = item.dataset.employee;
         const className = item.parentElement.parentElement.dataset.class;
         const timeSlot = item.parentElement.parentElement.dataset.time;

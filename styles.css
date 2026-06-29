@@ -289,6 +289,7 @@ th, td {
     padding: 12px;
     text-align: center;
     vertical-align: top;
+    position: relative;
 }
 
 th {
@@ -367,6 +368,8 @@ th {
     padding: 0;
     margin: 0;
     text-align: left;
+    position: relative;
+    min-height: 40px;
 }
 
 .employee-item {
@@ -389,14 +392,18 @@ th {
     opacity: 0.5;
 }
 
-/* Fehlend-Meldung - deutlicher, dass er nicht dazugehört */
+/* Fehlend-Meldung - deutlicher, dass er nicht dazugehört und unten in der Zelle */
 .employee-item.missing {
     background-color: rgba(255, 235, 238, 0.5) !important;
     border-left: 8px solid #d32f2f !important;
     border: 1px dashed #d32f2f !important;
-    position: relative;
-    margin-top: 8px !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
     opacity: 0.7;
+    z-index: 10;
 }
 
 .employee-item.missing::before {
@@ -422,6 +429,7 @@ th {
 .employee-item.missing.color-10,
 .employee-item.missing.color-11,
 .employee-item.missing.color-12,
+.employee-item.color-13,
 .employee-item.missing.color-13,
 .employee-item.missing.color-14,
 .employee-item.missing.color-15,
