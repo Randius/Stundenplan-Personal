@@ -94,6 +94,12 @@ function updateMissingMarkings() {
     
     // Alle Zellen durchgehen
     document.querySelectorAll('td[data-class][data-time]').forEach(cell => {
+        // Entferne bestehende fehlende Container
+        const existingMissingContainer = cell.querySelector('.missing-container');
+        if (existingMissingContainer) {
+            existingMissingContainer.remove();
+        }
+        
         const list = cell.querySelector('.employee-list');
         if (!list) return;
         
@@ -115,10 +121,17 @@ function updateMissingMarkings() {
             }
         });
         
-        // Neu ordnen: erst normale, dann fehlende
+        // Neu ordnen: erst normale
         list.innerHTML = '';
         presentItems.forEach(item => list.appendChild(item));
-        missingItems.forEach(item => list.appendChild(item));
+        
+        // Fehlende Mitarbeiter in separaten Container unter der Liste
+        if (missingItems.length > 0) {
+            const missingContainer = document.createElement('div');
+            missingContainer.className = 'missing-container';
+            missingItems.forEach(item => missingContainer.appendChild(item));
+            cell.appendChild(missingContainer);
+        }
     });
 }
 
@@ -128,9 +141,9 @@ function updateEffectiveMoves() {
         return;
     }
     
-    // Aktuelle Zuordnungen aus der Tabelle lesen
+    // Aktuelle Zuordnungen aus der Tabelle lesen (nur nicht-fehlende Mitarbeiter)
     const currentAssignments = {};
-    document.querySelectorAll('td[data-class][data-time] .employee-item:not(.missing)').forEach(item => {
+    document.querySelectorAll('td[data-class][data-time] .employee-list .employee-item').forEach(item => {
         const employee = item.dataset.employee;
         const className = item.parentElement.parentElement.dataset.class;
         const timeSlot = item.parentElement.parentElement.dataset.time;

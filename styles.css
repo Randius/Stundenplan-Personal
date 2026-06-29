@@ -368,8 +368,6 @@ th {
     padding: 0;
     margin: 0;
     text-align: left;
-    position: relative;
-    min-height: 40px;
 }
 
 .employee-item {
@@ -397,13 +395,8 @@ th {
     background-color: rgba(255, 235, 238, 0.5) !important;
     border-left: 8px solid #d32f2f !important;
     border: 1px dashed #d32f2f !important;
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 !important;
+    margin-top: 8px !important;
     opacity: 0.7;
-    z-index: 10;
 }
 
 .employee-item.missing::before {
@@ -413,6 +406,17 @@ th {
     top: 50%;
     transform: translateY(-50%);
     font-size: 16px;
+}
+
+/* Container für fehlende Mitarbeiter in der Zelle */
+.missing-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 4px 12px;
+    background-color: transparent;
+    z-index: 5;
 }
 
 /* Überschreibe alle Farbklassen für fehlende Mitarbeiter */
@@ -429,7 +433,6 @@ th {
 .employee-item.missing.color-10,
 .employee-item.missing.color-11,
 .employee-item.missing.color-12,
-.employee-item.color-13,
 .employee-item.missing.color-13,
 .employee-item.missing.color-14,
 .employee-item.missing.color-15,
