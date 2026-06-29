@@ -88,6 +88,18 @@ function updateMissingEmployeesList() {
     });
 }
 
+// Funktion zum Erstellen eines fehlenden Mitarbeiter-Elements
+function createMissingEmployeeElement(employeeName, className) {
+    const colorIndex = classColorMap[className] || 0;
+    const item = document.createElement('li');
+    item.className = `employee-item color-${colorIndex} missing`;
+    item.dataset.employee = employeeName;
+    item.dataset.originalClass = className;
+    item.draggable = true;
+    item.textContent = employeeName;
+    return item;
+}
+
 // Funktion zum Aktualisieren der Fehlend-Markierungen in der Tabelle
 function updateMissingMarkings() {
     if (!currentData) return;
@@ -103,52 +115,54 @@ function updateMissingMarkings() {
         const list = cell.querySelector('.employee-list');
         if (!list) return;
         
-        const items = Array.from(list.querySelectorAll('.employee-item'));
-        const colorIndex = classColorMap[cell.dataset.class];
+        const className = cell.dataset.class;
+        const timeSlot = cell.dataset.time;
+        
+        // Finde alle Mitarbeiter, die in dieser Zelle sein sollten
+        const expectedEmployees = currentData.assignments[timeSlot]?.[className] || [];
         
         // Trenne fehlende und nicht-fehlende Mitarbeiter
         const presentItems = [];
-        const missingItems = [];
+        const missingInThisCell = [];
         
-        items.forEach(item => {
-            const employeeName = item.dataset.employee;
-            if (missingEmployees.has(employeeName)) {
-                item.classList.add('missing');
-                missingItems.push(item);
+        // Gehe durch alle erwarteten Mitarbeiter
+        expectedEmployees.forEach(employee => {
+            if (missingEmployees.has(employee)) {
+                missingInThisCell.push(employee);
             } else {
-                item.classList.remove('missing');
-                presentItems.push(item);
+                presentItems.push(employee);
             }
         });
         
-        // Neu ordnen: erst normale
+        // Neu ordnen: erst normale Mitarbeiter
         list.innerHTML = '';
-        presentItems.forEach(item => list.appendChild(item));
+        presentItems.forEach(employee => {
+            const colorIndex = classColorMap[className];
+            const item = document.createElement('li');
+            item.className = `employee-item color-${colorIndex}`;
+            item.dataset.employee = employee;
+            item.dataset.originalClass = className;
+            item.draggable = true;
+            item.textContent = employee;
+            list.appendChild(item);
+        });
         
         // Fehlende Mitarbeiter in separaten Container unter der Liste
-        if (missingItems.length > 0) {
+        if (missingInThisCell.length > 0) {
             const missingContainer = document.createElement('div');
             missingContainer.className = 'missing-container';
-            missingItems.forEach(item => missingContainer.appendChild(item));
+            missingInThisCell.forEach(employee => {
+                const item = createMissingEmployeeElement(employee, className);
+                missingContainer.appendChild(item);
+            });
             cell.appendChild(missingContainer);
         }
     });
     
-    // Zellenhöhe anpassen, damit Platz für fehlende Mitarbeiter ist
-    adjustCellHeights();
-}
-
-// Funktion zum Anpassen der Zellenhöhe für fehlende Mitarbeiter
-function adjustCellHeights() {
-    document.querySelectorAll('td[data-class][data-time]').forEach(cell => {
-        const hasMissing = cell.querySelector('.missing-container') !== null;
-        if (hasMissing) {
-            // Mindesthöhe setzen, damit Platz für fehlende Mitarbeiter ist
-            cell.style.minHeight = '100px';
-        } else {
-            cell.style.minHeight = '';
-        }
-    });
+    // Drag & Drop für neue Elemente einrichten
+    setupDragAndDrop();
+    // Verschiebungen aktualisieren
+    setTimeout(updateEffectiveMoves, 100);
 }
 
 // Funktion zum Aktualisieren der effektiven Verschiebungen
