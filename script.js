@@ -88,85 +88,17 @@ function updateMissingEmployeesList() {
     });
 }
 
-// Funktion zum Erstellen eines fehlenden Mitarbeiter-Elements
-function createMissingItem(employeeName, className) {
-    const colorIndex = classColorMap[className] || 0;
-    const item = document.createElement('li');
-    item.className = `employee-item color-${colorIndex} missing`;
-    item.dataset.employee = employeeName;
-    item.dataset.originalClass = className;
-    item.textContent = employeeName;
-    return item;
-}
-
 // Funktion zum Aktualisieren der Fehlend-Markierungen in der Tabelle
 function updateMissingMarkings() {
     if (!currentData) return;
     
-    // Zuerst alle fehlenden Container entfernen
-    document.querySelectorAll('.missing-container').forEach(container => container.remove());
-    
-    // Alle Mitarbeiter in allen Zellen durchgehen und fehlende verstecken
-    document.querySelectorAll('td[data-class][data-time] .employee-list .employee-item').forEach(item => {
+    // Alle Mitarbeiter-Items durchgehen
+    document.querySelectorAll('.employee-item').forEach(item => {
         const employeeName = item.dataset.employee;
         if (missingEmployees.has(employeeName)) {
-            item.style.display = 'none';
+            item.classList.add('missing');
         } else {
-            item.style.display = 'list-item';
-        }
-    });
-    
-    // Jetzt für jeden fehlenden Mitarbeiter die Zelle finden und anzeigen
-    missingEmployees.forEach(employeeName => {
-        // 1. Versuche: Finde die Zelle, in der der Mitarbeiter aktuell ist (sichtbar)
-        let targetCell = null;
-        document.querySelectorAll('td[data-class][data-time] .employee-list .employee-item').forEach(item => {
-            if (item.dataset.employee === employeeName && item.style.display !== 'none') {
-                targetCell = item.parentElement.parentElement;
-            }
-        });
-        
-        // 2. Falls nicht gefunden: Finde die Zelle aus originalAssignments
-        if (!targetCell && originalAssignments[employeeName]) {
-            for (const timeSlot in originalAssignments[employeeName]) {
-                const originalClass = originalAssignments[employeeName][timeSlot].className;
-                const cellSelector = `td[data-class="${originalClass}"][data-time="${timeSlot}"]`;
-                targetCell = document.querySelector(cellSelector);
-                if (targetCell) break;
-            }
-        }
-        
-        // 3. Falls immer noch nicht gefunden: Suche in ALLEN Zellen nach dem Mitarbeiter
-        if (!targetCell) {
-            document.querySelectorAll('td[data-class][data-time]').forEach(cell => {
-                const list = cell.querySelector('.employee-list');
-                if (list) {
-                    const items = Array.from(list.querySelectorAll('.employee-item'));
-                    if (items.some(item => item.dataset.employee === employeeName)) {
-                        targetCell = cell;
-                    }
-                }
-            });
-        }
-        
-        // Fehlenden Mitarbeiter in der gefundenen Zelle anzeigen
-        if (targetCell) {
-            const className = targetCell.dataset.class;
-            let missingContainer = targetCell.querySelector('.missing-container');
-            if (!missingContainer) {
-                missingContainer = document.createElement('div');
-                missingContainer.className = 'missing-container';
-                targetCell.appendChild(missingContainer);
-            }
-            
-            // Prüfe, ob der Mitarbeiter schon im Container ist
-            const alreadyThere = Array.from(missingContainer.querySelectorAll('.employee-item')).
-                .some(item => item.dataset.employee === employeeName);
-            
-            if (!alreadyThere) {
-                const item = createMissingItem(employeeName, className);
-                missingContainer.appendChild(item);
-            }
+            item.classList.remove('missing');
         }
     });
 }
@@ -177,9 +109,9 @@ function updateEffectiveMoves() {
         return;
     }
     
-    // Aktuelle Zuordnungen aus der Tabelle lesen (nur sichtbare Mitarbeiter in employee-list)
+    // Aktuelle Zuordnungen aus der Tabelle lesen
     const currentAssignments = {};
-    document.querySelectorAll('td[data-class][data-time] .employee-list .employee-item:not([style*="display: none"])').forEach(item => {
+    document.querySelectorAll('td[data-class][data-time] .employee-item:not(.missing)').forEach(item => {
         const employee = item.dataset.employee;
         const className = item.parentElement.parentElement.dataset.class;
         const timeSlot = item.parentElement.parentElement.dataset.time;
@@ -406,9 +338,6 @@ function generateTable() {
 
     // Für jede Tageszeit eine Zeile
     for (const timeSlot of currentData.timeSlots) {
-        const timeSlotDe = timeSlot === 'Vormittag' ? 'Vormittag' : 
-                           timeSlot === 'Nachmittag' ? 'Nachmittag' : 
-                           timeSlot;
         const cellClass = timeSlot === 'Vormittag' ? 'morning-cell' : 'afternoon-cell';
         
         let row = `<tr>`;
@@ -502,7 +431,7 @@ function setupDragAndDrop() {
                 if (newList) {
                     newList.appendChild(draggedItem);
                     // Nach dem Verschieben die Sortierung aktualisieren
-                    setTimeout(() => updateMissingMarkings(), 50);
+                    setTimeout(updateMissingMarkings, 50);
                 }
                 
                 // Aktualisiere die Liste der effektiven Verschiebungen

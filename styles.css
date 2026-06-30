@@ -290,6 +290,7 @@ th, td {
     text-align: center;
     vertical-align: top;
     position: relative;
+    min-height: 80px;
 }
 
 th {
@@ -299,7 +300,6 @@ th {
 }
 
 /* 25 gut unterscheidbare Farben für Klassenspalten */
-/* Header-Zellen: Hintergrundfarbe + weißer Text */
 .header-cell.color-0 { background-color: #FF5722; color: white; font-weight: bold; }
 .header-cell.color-1 { background-color: #E91E63; color: white; font-weight: bold; }
 .header-cell.color-2 { background-color: #9C27B0; color: white; font-weight: bold; }
@@ -326,7 +326,7 @@ th {
 .header-cell.color-23 { background-color: #455A64; color: white; font-weight: bold; }
 .header-cell.color-24 { background-color: #37474F; color: white; font-weight: bold; }
 
-/* Mitarbeiter-Labels: border-left in der Farbe der Klasse (8px breit) */
+/* Mitarbeiter-Labels */
 .employee-item.color-0 { border-left: 8px solid #FF5722; }
 .employee-item.color-1 { border-left: 8px solid #E91E63; }
 .employee-item.color-2 { border-left: 8px solid #9C27B0; }
@@ -355,12 +355,10 @@ th {
 
 .morning-cell {
     background-color: #E8F5E9;
-    min-height: 80px;
 }
 
 .afternoon-cell {
     background-color: #C8E6C9;
-    min-height: 80px;
 }
 
 .employee-list {
@@ -368,6 +366,8 @@ th {
     padding: 0;
     margin: 0;
     text-align: left;
+    position: relative;
+    min-height: 60px;
 }
 
 .employee-item {
@@ -390,13 +390,18 @@ th {
     opacity: 0.5;
 }
 
-/* Fehlend-Meldung - deutlicher, dass er nicht dazugehört und unten in der Zelle */
+/* Fehlend-Meldung - EINFACHE LÖSUNG: position: absolute in der Zelle */
 .employee-item.missing {
-    background-color: rgba(255, 235, 238, 0.5) !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background-color: rgba(255, 235, 238, 0.7) !important;
     border-left: 8px solid #d32f2f !important;
     border: 1px dashed #d32f2f !important;
-    margin: 4px 0 !important;
-    opacity: 0.7;
+    margin: 0 !important;
+    opacity: 0.9;
+    z-index: 10;
 }
 
 .employee-item.missing::before {
@@ -406,13 +411,6 @@ th {
     top: 50%;
     transform: translateY(-50%);
     font-size: 16px;
-}
-
-/* Container für fehlende Mitarbeiter in der Zelle */
-.missing-container {
-    margin-top: 8px;
-    padding: 0;
-    text-align: left;
 }
 
 /* Überschreibe alle Farbklassen für fehlende Mitarbeiter */
