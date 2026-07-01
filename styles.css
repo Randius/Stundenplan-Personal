@@ -291,13 +291,6 @@ th, td {
     vertical-align: top;
 }
 
-/* Zellen mit Mitarbeiterlisten als Flex-Container für vertikale Ausrichtung */
-td[data-class][data-time] {
-    display: flex;
-    flex-direction: column;
-    min-height: 60px;
-}
-
 th {
     background-color: #4CAF50;
     color: white;
@@ -376,8 +369,6 @@ th {
     flex-direction: column;
     gap: 4px;
     min-height: 60px;
-    flex-grow: 1;
-    overflow-y: auto;
 }
 
 .employee-item {
