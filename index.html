@@ -14,7 +14,7 @@
         <!-- Einstellungen (einklappbar) -->
         <div class="settings-section">
             <button class="settings-toggle" id="settingsToggle" onclick="toggleSettings()">
-                🛠️ Einstellungen
+                🔧 Einstellungen
             </button>
             <div class="settings-content" id="settingsContent">
                 <div class="settings-grid">
@@ -38,6 +38,30 @@
                     <div class="moves-section">
                         <h3>Verschiebungen</h3>
                         <div id="movesList" class="moves-list"></div>
+                        
+                        <!-- Neue UI für direkte Verschiebung -->
+                        <div class="direct-move">
+                            <h4>Mitarbeiter verschieben</h4>
+                            <div class="form-group">
+                                <label for="moveEmployeeInput">Mitarbeiter:</label>
+                                <input type="text" id="moveEmployeeInput" class="autocomplete-input" placeholder="Mitarbeiter auswählen">
+                                <div id="moveEmployeeSuggestions" class="autocomplete-suggestions"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="targetClassSelect">Zielklasse:</label>
+                                <select id="targetClassSelect" class="autocomplete-input">
+                                    <option value="">Klasse auswählen</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="timeSlotSelect">Zeitslot:</label>
+                                <select id="timeSlotSelect" class="autocomplete-input">
+                                    <option value="Vormittag">Vormittag</option>
+                                    <option value="Nachmittag">Nachmittag</option>
+                                </select>
+                            </div>
+                            <button id="moveEmployeeButton" class="upload-button">Verschieben</button>
+                        </div>
                     </div>
                 </div>
             </div>

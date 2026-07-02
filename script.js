@@ -33,8 +33,9 @@ function filterEmployees(input) {
 }
 
 // Funktion zum Anzeigen der Autocomplete-Vorschläge
-function showSuggestions(suggestions) {
-    const suggestionsContainer = document.getElementById('missingEmployeeSuggestions');
+function showSuggestions(suggestions, containerId, inputId, onSelectCallback) {
+    const suggestionsContainer = document.getElementById(containerId);
+    const inputElement = document.getElementById(inputId);
     suggestionsContainer.innerHTML = '';
     
     if (suggestions.length === 0) {
@@ -46,9 +47,9 @@ function showSuggestions(suggestions) {
         const div = document.createElement('div');
         div.textContent = employee;
         div.onclick = () => {
-            addMissingEmployee(employee);
+            onSelectCallback(employee);
             suggestionsContainer.classList.remove('show');
-            document.getElementById('missingEmployeeInput').value = '';
+            inputElement.value = employee;
         };
         suggestionsContainer.appendChild(div);
     });
@@ -291,8 +292,25 @@ function parseCSV(content) {
     // Aktualisiere die Listen
     updateMissingEmployeesList();
     
+    // Fülle die Dropdowns für die direkte Verschiebung
+    fillTargetClassDropdown();
+    
     // Aktualisiere die Verschiebungen-Liste (wird in generateTable aufgerufen)
     setTimeout(updateEffectiveMoves, 100);
+}
+
+// Funktion zum Füllen des Zielklasse-Dropdowns
+function fillTargetClassDropdown() {
+    const targetClassSelect = document.getElementById('targetClassSelect');
+    if (!targetClassSelect || !sortedClasses || sortedClasses.length === 0) return;
+    
+    targetClassSelect.innerHTML = '<option value="">Klasse auswählen</option>';
+    sortedClasses.forEach(className => {
+        const option = document.createElement('option');
+        option.value = className;
+        option.textContent = className;
+        targetClassSelect.appendChild(option);
+    });
 }
 
 // Funktion zum Generieren der Tabelle
@@ -370,6 +388,60 @@ function generateTable() {
 // Funktion zum Bestimmen der Farbklasse basierend auf dem Index
 function getColorClass(index) {
     return `color-${index % 25}`;
+}
+
+// Funktion zum Verschieben eines Mitarbeiters in eine andere Klasse
+function moveEmployeeToClass(employeeName, targetClass, timeSlot) {
+    if (!currentData || !employeeName || !targetClass || !timeSlot) return;
+    
+    // Normalisiere den timeSlot (z. B. "Vormittag" -> "vormittag")
+    const normalizedTimeSlot = timeSlot.toLowerCase();
+    
+    // Finde die aktuelle Zelle des Mitarbeiters
+    let currentCell = null;
+    let currentList = null;
+    let currentEmployeeItem = null;
+    
+    document.querySelectorAll('td[data-class][data-time] .employee-item').forEach(item => {
+        if (item.dataset.employee === employeeName && item.parentElement.parentElement.dataset.time === normalizedTimeSlot) {
+            currentEmployeeItem = item;
+            currentList = item.parentElement;
+            currentCell = item.parentElement.parentElement;
+        }
+    });
+    
+    if (!currentEmployeeItem || !currentList || !currentCell) {
+        alert(`Mitarbeiter "${employeeName}" nicht gefunden im Zeitslot "${timeSlot}".`);
+        return;
+    }
+    
+    // Finde die Zielzelle
+    const targetCellSelector = `td[data-class="${targetClass}"][data-time="${normalizedTimeSlot}"]`;
+    const targetCell = document.querySelector(targetCellSelector);
+    const targetList = targetCell ? targetCell.querySelector('.employee-list') : null;
+    
+    if (!targetCell || !targetList) {
+        alert(`Zielklasse "${targetClass}" nicht gefunden im Zeitslot "${timeSlot}".`);
+        return;
+    }
+    
+    // Entferne den Mitarbeiter aus der aktuellen Zelle
+    currentEmployeeItem.remove();
+    
+    // Füge den Mitarbeiter zur Zielzelle hinzu
+    const colorIndex = classColorMap[targetClass] || 0;
+    currentEmployeeItem.className = `employee-item color-${colorIndex}`;
+    currentEmployeeItem.dataset.originalClass = targetClass;
+    targetList.appendChild(currentEmployeeItem);
+    
+    // Aktualisiere die Fehlend-Markierungen und Verschiebungen
+    setTimeout(updateMissingMarkings, 50);
+    setTimeout(updateEffectiveMoves, 100);
+    
+    // Setze die Eingabefelder zurück
+    document.getElementById('moveEmployeeInput').value = '';
+    document.getElementById('targetClassSelect').value = '';
+    document.getElementById('timeSlotSelect').value = '';
 }
 
 // Drag & Drop Funktionalität für Mitarbeiter
@@ -456,7 +528,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clearTimeout(autocompleteTimeout);
         autocompleteTimeout = setTimeout(() => {
             const suggestions = filterEmployees(this.value);
-            showSuggestions(suggestions);
+            showSuggestions(suggestions, 'missingEmployeeSuggestions', 'missingEmployeeInput', addMissingEmployee);
         }, 200);
     });
     
@@ -475,6 +547,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('missingEmployeeSuggestions').classList.remove('show');
             }
         }
+    });
+
+    // Autocomplete für direkte Verschiebung
+    const moveEmployeeInput = document.getElementById('moveEmployeeInput');
+    moveEmployeeInput.addEventListener('input', function() {
+        clearTimeout(autocompleteTimeout);
+        autocompleteTimeout = setTimeout(() => {
+            const suggestions = filterEmployees(this.value);
+            showSuggestions(suggestions, 'moveEmployeeSuggestions', 'moveEmployeeInput', (employee) => {
+                moveEmployeeInput.value = employee;
+            });
+        }, 200);
+    });
+    
+    moveEmployeeInput.addEventListener('blur', function() {
+        setTimeout(() => {
+            document.getElementById('moveEmployeeSuggestions').classList.remove('show');
+        }, 200);
+    });
+
+    // Button für direkte Verschiebung
+    const moveEmployeeButton = document.getElementById('moveEmployeeButton');
+    moveEmployeeButton.addEventListener('click', function() {
+        const employeeInput = document.getElementById('moveEmployeeInput');
+        const targetClassSelect = document.getElementById('targetClassSelect');
+        const timeSlotSelect = document.getElementById('timeSlotSelect');
+        
+        const employeeName = employeeInput.value.trim();
+        const targetClass = targetClassSelect.value;
+        const timeSlot = timeSlotSelect.value;
+        
+        if (!employeeName || !targetClass || !timeSlot) {
+            alert('Bitte wählen Sie einen Mitarbeiter, eine Zielklasse und einen Zeitslot aus.');
+            return;
+        }
+        
+        // Überprüfe, ob der Mitarbeiter existiert
+        if (!currentData.employees.includes(employeeName)) {
+            alert(`Mitarbeiter "${employeeName}" nicht gefunden.`);
+            return;
+        }
+        
+        moveEmployeeToClass(employeeName, targetClass, timeSlot);
     });
 
     // Drag Over Event für Upload-Bereich
