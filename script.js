@@ -428,9 +428,9 @@ function moveEmployeeToClass(employeeName, targetClass, timeSlot) {
     // Entferne den Mitarbeiter aus der aktuellen Zelle
     currentEmployeeItem.remove();
     
-    // Füge den Mitarbeiter zur Zielzelle hinzu
-    const colorIndex = classColorMap[targetClass] || 0;
-    currentEmployeeItem.className = `employee-item color-${colorIndex}`;
+    // Behalte die bestehende Farbklasse des Mitarbeiters bei (von der ursprünglichen Klasse)
+    const currentColorClass = Array.from(currentEmployeeItem.classList).find(cls => cls.startsWith('color-')) || 'color-0';
+    currentEmployeeItem.className = `employee-item ${currentColorClass}`;
     currentEmployeeItem.dataset.originalClass = targetClass;
     targetList.appendChild(currentEmployeeItem);
     
